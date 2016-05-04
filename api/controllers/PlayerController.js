@@ -10,7 +10,7 @@ module.exports = {
 		Player.findOne(req.param('id'))
 			.populate('team')
 			.exec(function(err, playerRecord) {
-				if (playerRecord === undefined || playerRecord === null) {
+				if (typeof playerRecord === 'undefined' || playerRecord === null) {
 					res.notFound();
 				} else {
 					res.view('view.ejs', {player: playerRecord});
