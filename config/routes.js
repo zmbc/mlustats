@@ -32,7 +32,13 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': 'PlayerController.view'
+  '/': {
+	  view: 'homepage'
+  },
+  '/player/:id' : {
+	  controller: 'PlayerController',
+	  action: 'view'
+  }
 
   /***************************************************************************
   *                                                                          *

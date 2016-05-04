@@ -7,9 +7,14 @@
 
 module.exports = {
 	view: function(req, res) {
-		Player.findOrCreate({name: 'Joe Smith'})
-			.exec(function(err, record) {
-				res.view('view.ejs', {player: record});
+		Player.findOne(req.param('id'))
+			.populate('team')
+			.exec(function(err, playerRecord) {
+				if (playerRecord === undefined || playerRecord === null) {
+					res.notFound();
+				} else {
+					res.view('view.ejs', {player: playerRecord});
+				}
 			});
 	}
 };
