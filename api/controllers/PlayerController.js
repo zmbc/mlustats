@@ -6,7 +6,7 @@
  */
 
 module.exports = {
-	view: function(req, res) {
+	view: function(req, res) {		
 		Player.findOne(req.param('id'))
 			.populate('team')
 			.exec(function(err, playerRecord) {

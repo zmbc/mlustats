@@ -14,7 +14,12 @@ module.exports = {
     
     team: {
       model: 'team'
-    }
+    },
+    
+    mluApiId: {
+		type: 'string',
+		unique: true
+	}
   }
 };
 
