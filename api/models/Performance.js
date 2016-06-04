@@ -55,7 +55,7 @@ module.exports = {
 	stalls: {
 		type: 'integer'
 	},
-	turnovers: {
+	offensivePossessions: {
 		type: 'integer'
 	},
 	offensivePointsPlayed: {
