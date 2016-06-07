@@ -56,13 +56,18 @@ self = module.exports = {
 	scrapeWeek: function(seasonAndWeek) {
 		var request = require('request');
 		request('https://mlustats.herokuapp.com/api/schedule', function (error, response, body) {
-			if (!error && response.statusCode == 200) {				
+			if (!error && response.statusCode == 200) {
 				var schedule = JSON.parse(body)[0];
+				var games;
 				
-				var games = schedule.filter(function(gameObj) {
-					return gameObj.SeasonID === seasonAndWeek.season &&
-							gameObj.Week === seasonAndWeek.week;
-				});
+				if (seasonAndWeek !== 'all') {
+					games = schedule.filter(function(gameObj) {
+						return gameObj.SeasonID === seasonAndWeek.season &&
+								gameObj.Week === seasonAndWeek.week;
+					});
+				} else {
+					games = schedule;
+				}
 		
 				games.forEach(function(element, index, array) {
 					request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
@@ -119,5 +124,8 @@ self = module.exports = {
 				self.scrapeWeek(currentWeek);
 			}
 		});
+	},
+	scrapeAll: function() {
+		self.scrapeWeek('all');
 	}
 };
