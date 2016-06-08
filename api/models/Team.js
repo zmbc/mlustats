@@ -15,6 +15,10 @@ module.exports = {
       type: 'string'
     },
     
+    color: {
+	  type: 'string'
+	},
+    
     players: {
       collection: 'player',
     },

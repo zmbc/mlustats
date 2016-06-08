@@ -79,7 +79,8 @@ self = module.exports = {
 									{
 										mluApiId: gameData[1][0]['HomeTeamID'],
 										name: gameData[0][0]['HomeTeam'],
-										city: gameData[0][0]['HomeTeamCity']
+										city: gameData[0][0]['HomeTeamCity'],
+										color: gameData[0][0]['HomeTeamColor']
 									},
 									function(err, homeTeamRecord) {
 										gameRecord.homeTeam = homeTeamRecord.id;
@@ -89,7 +90,8 @@ self = module.exports = {
 											{
 												mluApiId: gameData[2][0]['AwayTeamID'],
 												name: gameData[0][0]['AwayTeam'],
-												city: gameData[0][0]['AwayTeamCity']
+												city: gameData[0][0]['AwayTeamCity'],
+												color: gameData[0][0]['AwayTeamColor']
 											},
 											function(err, awayTeamRecord) {
 												gameRecord.awayTeam = awayTeamRecord.id;
