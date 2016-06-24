@@ -8,13 +8,13 @@
 module.exports = {
   attributes: {
 	player: {
-		model: 'player'
+		model: 'players'
 	},
 	game: {
-		model: 'game'
+		model: 'games'
 	},
 	team: {
-		model: 'team'
+		model: 'teams'
 	},
 	goals: {
 		type: 'integer'

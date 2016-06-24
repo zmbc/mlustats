@@ -8,11 +8,11 @@
 module.exports = {
   attributes: {
 	  homeTeam: {
-		  model: 'team'
+		  model: 'teams'
 	  },
 	  
 	  awayTeam: {
-		  model: 'team'
+		  model: 'teams'
 	  },
 	  
 	  mluApiId: {

@@ -36,7 +36,7 @@ module.exports.routes = {
 	  view: 'homepage'
   },
   '/player/:id' : {
-	  controller: 'PlayerController',
+	  controller: 'PlayersController',
 	  action: 'view'
   }
 

@@ -20,8 +20,9 @@ module.exports = function(grunt) {
 			src: 'test', // the folder, not the files
 			options: {
 			  coverageFolder: 'coverage',
-			  mask: '**/*.spec.js',
-			  root: 'api/'
+			  mask: '**/**/*.spec.js',
+			  root: 'api/',
+			  mochaOptions: ['test/bootstrap.spec.js']
 			}
 		  }
 		}
