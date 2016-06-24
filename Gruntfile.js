@@ -14,6 +14,18 @@
 
 module.exports = function(grunt) {
 
+	grunt.initConfig({
+		mocha_istanbul: {
+		  coverage: {
+			src: 'test', // the folder, not the files
+			options: {
+			  coverageFolder: 'coverage',
+			  mask: '**/*.spec.js',
+			  root: 'api/'
+			}
+		  }
+		}
+	});
 
 	// Load the include-all library in order to require all of our grunt
 	// configurations and task registrations dynamically.
@@ -78,4 +90,11 @@ module.exports = function(grunt) {
 	invokeConfigFn(taskConfigurations);
 	invokeConfigFn(registerDefinitions);
 
+	// Adds "grunt-mocha-istanbul" npm task
+	grunt.loadNpmTasks('grunt-mocha-istanbul');
+
+	// Adding test task enabling "grunt test" command
+	grunt.registerTask('test', [
+	  'mocha_istanbul:coverage'
+	]);
 };

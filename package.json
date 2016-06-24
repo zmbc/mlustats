@@ -35,5 +35,12 @@
     "url": "git://github.com/zebburkeconte/testProject.git"
   },
   "author": "zebburkeconte",
-  "license": ""
+  "license": "",
+  "devDependencies": {
+    "grunt-mocha-istanbul": "^5.0.1",
+    "istanbul": "^0.4.4",
+    "mocha": "^2.5.3",
+    "should": "^9.0.2",
+    "sinon": "^1.17.4"
+  }
 }
