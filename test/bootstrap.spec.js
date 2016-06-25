@@ -26,7 +26,7 @@ before(function(done) {
     global.fixtures = barrels.data;
 
     // Populate the DB
-    barrels.populate(function(err) {
+    barrels.populate(['teams', 'players'], function(err) {
       done(err, sails);
     });
   });

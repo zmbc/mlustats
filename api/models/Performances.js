@@ -20,68 +20,52 @@ module.exports = {
     required: true
   },
   goals: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   assists: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   hockeyAssists: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   blocks: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   throws: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   throwaways: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   throwsIntoBlocks: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   catches: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   callahans: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   drops: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   fouls: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   travels: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   stalls: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   offensivePossessions: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   offensivePointsPlayed: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   },
   defensivePointsPlayed: {
-    type: 'integer',
-    required: true
+    type: 'integer'
   }
   }
 };

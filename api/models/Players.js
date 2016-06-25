@@ -27,7 +27,7 @@ module.exports = {
     type: 'string',
     unique: true,
     required: true
-  }
+    }
   }
 };
 

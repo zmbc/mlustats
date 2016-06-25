@@ -21,98 +21,107 @@ self = module.exports = {
       {mluApiId: data.PlayerID},
       {
         mluApiId: data.PlayerID,
-        name: data.Player
+        name: data.Player,
+        team: teamRecord.id
       },
       function(err, playerRecord) {
         playerRecord.team = teamRecord.id;
         playerRecord.save();
-        Performances.findOrCreate({game: gameRecord.id, player: playerRecord.id}, function(err, performanceRecord) {
-          performanceRecord.team = teamRecord.id;
-          
-          performanceRecord.goals = data.Goals;
-          performanceRecord.assists = data.Assists;
-          performanceRecord.hockeyAssists = data.HockeyAssists;
-          performanceRecord.blocks = data.Blocks;
-          performanceRecord.throws = data.Throws;
-          performanceRecord.throwaways = data.Throwaways;
-          performanceRecord.throwsIntoBlocks = data.ThrowIntoBlocks;
-          performanceRecord.catches = data.Catches;
-          performanceRecord.callahans = data.Callahans;
-          performanceRecord.drops = data.Drops;
-          performanceRecord.fouls = data.Fouls;
-          performanceRecord.travels = data.Travels;
-          performanceRecord.stalls = data.Stalls;
-          performanceRecord.offensivePointsPlayed = data.OPointsPlayed;
-          performanceRecord.defensivePointsPlayed = data.DPointsPlayed;
-          
-          var touches = data.Throws + data.Stalls + data.Goals;
-          
-          performanceRecord.offensivePossessions = Math.round(touches / parseFloat(data.TPOP));
-          
-          performanceRecord.save(callback);
+        Performances.findOrCreate(
+          {game: gameRecord.id, player: playerRecord.id},
+          {
+            game: gameRecord.id,
+            player: playerRecord.id,
+            team: teamRecord.id
+          },
+          function(err, performanceRecord) {
+            performanceRecord.team = teamRecord.id;
+            
+            performanceRecord.goals = data.Goals;
+            performanceRecord.assists = data.Assists;
+            performanceRecord.hockeyAssists = data.HockeyAssists;
+            performanceRecord.blocks = data.Blocks;
+            performanceRecord.throws = data.Throws;
+            performanceRecord.throwaways = data.Throwaways;
+            performanceRecord.throwsIntoBlocks = data.ThrowIntoBlocks;
+            performanceRecord.catches = data.Catches;
+            performanceRecord.callahans = data.Callahans;
+            performanceRecord.drops = data.Drops;
+            performanceRecord.fouls = data.Fouls;
+            performanceRecord.travels = data.Travels;
+            performanceRecord.stalls = data.Stalls;
+            performanceRecord.offensivePointsPlayed = data.OPointsPlayed;
+            performanceRecord.defensivePointsPlayed = data.DPointsPlayed;
+            
+            var touches = data.Throws + data.Stalls + data.Goals;
+            
+            performanceRecord.offensivePossessions = Math.round(touches / parseFloat(data.TPOP));
+            
+            performanceRecord.save(callback);
         });
     });
   },
   _createModelsFromGame: function(gameObj, callback) {
-    Games.findOrCreate({mluApiId: gameObj[0][0].ga_id_pk}, function(err, gameRecord) {
-      Teams.findOrCreate(
-        {mluApiId: gameObj[1][0].HomeTeamID},
-        {
-          mluApiId: gameObj[1][0].HomeTeamID,
-          name: gameObj[0][0].HomeTeam,
-          city: gameObj[0][0].HomeTeamCity,
-          color: gameObj[0][0].HomeTeamColor
-        },
-        function(err, homeTeamRecord) {
-          gameRecord.homeTeam = homeTeamRecord.id;
-          
-          Teams.findOrCreate(
-            {mluApiId: gameObj[2][0].AwayTeamID},
-            {
-              mluApiId: gameObj[2][0].AwayTeamID,
-              name: gameObj[0][0].AwayTeam,
-              city: gameObj[0][0].AwayTeamCity,
-              color: gameObj[0][0].AwayTeamColor
-            },
-            function(err, awayTeamRecord) {
-              gameRecord.awayTeam = awayTeamRecord.id;
-              gameRecord.save();
-              
-              var homePerformances = gameObj[5];
-              var awayPerformances = gameObj[6];
-              
-              var numberParallel = homePerformances.length + awayPerformances.length;
-              var numberDone = 0;
-              
-              homePerformances.forEach(function(element, index, array) {
-                self._makePerformanceFromData(element, homeTeamRecord, gameRecord, function(err, record) {
-                  if (err) {
-                    callback(err);
-                  }
-                  
-                  numberDone++;
-                  console.log(numberDone + ' of ' + numberParallel + ' performances complete');
-                  
-                  if (numberDone === numberParallel) {
-                    callback();
-                  }
+    Teams.findOrCreate(
+      {mluApiId: gameObj[1][0].HomeTeamID},
+      {
+        mluApiId: gameObj[1][0].HomeTeamID,
+        name: gameObj[0][0].HomeTeam,
+        city: gameObj[0][0].HomeTeamCity,
+        color: gameObj[0][0].HomeTeamColor
+      },
+      function(err, homeTeamRecord) {          
+        Teams.findOrCreate(
+          {mluApiId: gameObj[2][0].AwayTeamID},
+          {
+            mluApiId: gameObj[2][0].AwayTeamID,
+            name: gameObj[0][0].AwayTeam,
+            city: gameObj[0][0].AwayTeamCity,
+            color: gameObj[0][0].AwayTeamColor
+          },
+          function(err, awayTeamRecord) {
+            Games.findOrCreate(
+              {
+                mluApiId: gameObj[0][0].ga_id_pk,
+                homeTeam: homeTeamRecord.id,
+                awayTeam: awayTeamRecord.id
+              },
+              function(err, gameRecord) {
+                var homePerformances = gameObj[5];
+                var awayPerformances = gameObj[6];
+                
+                var numberParallel = homePerformances.length + awayPerformances.length;
+                var numberDone = 0;
+                
+                homePerformances.forEach(function(element, index, array) {
+                  self._makePerformanceFromData(element, homeTeamRecord, gameRecord, function(err, record) {
+                    if (err) {
+                      callback(err);
+                    }
+                    
+                    numberDone++;
+                    console.log(numberDone + ' of ' + numberParallel + ' performances complete');
+                    
+                    if (numberDone === numberParallel) {
+                      callback();
+                    }
+                  });
                 });
-              });
-              
-              awayPerformances.forEach(function(element, index, array) {
-                self._makePerformanceFromData(element, awayTeamRecord, gameRecord, function(err, record) {
-                  if (err) {
-                    callback(err);
-                  }
-                  
-                  numberDone++;
-                  console.log(numberDone + ' of ' + numberParallel + ' performances complete');
-                  
-                  if (numberDone === numberParallel) {
-                    callback();
-                  }
+                
+                awayPerformances.forEach(function(element, index, array) {
+                  self._makePerformanceFromData(element, awayTeamRecord, gameRecord, function(err, record) {
+                    if (err) {
+                      callback(err);
+                    }
+                    
+                    numberDone++;
+                    console.log(numberDone + ' of ' + numberParallel + ' performances complete');
+                    
+                    if (numberDone === numberParallel) {
+                      callback();
+                    }
+                  });
                 });
-              });
             });
         }); 
     });
