@@ -9,17 +9,25 @@ module.exports = {
 
   attributes: {
     name: {
-      type: 'string'
+      type: 'string',
+      required: true
     },
     
     team: {
-      model: 'teams'
+      model: 'teams',
+      required: true
+    },
+    
+    performances: {
+      collection: 'performances',
+      via: 'player'
     },
     
     mluApiId: {
-		type: 'string',
-		unique: true
-	}
+    type: 'string',
+    unique: true,
+    required: true
+  }
   }
 };
 

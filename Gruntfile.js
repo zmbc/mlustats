@@ -14,104 +14,104 @@
 
 module.exports = function(grunt) {
 
-	grunt.initConfig({
-		mocha_istanbul: {
-		  coverage: {
-			src: 'test', // the folder, not the files
-			options: {
-			  coverageFolder: 'coverage',
-			  mask: '**/**/*.spec.js',
-			  root: 'api/',
-			  mochaOptions: ['test/bootstrap.spec.js']
-			}
-		  }
-		},
-		jshint: {
-			all: ['api/**/*.js', 'test/**/**/*.spec.js']
-		},
-		coveralls: {
-			ci: {
-				src: 'coverage/lcov.info'
-			}
-		}
-	});
+  grunt.initConfig({
+    mocha_istanbul: {
+      coverage: {
+      src: 'test', // the folder, not the files
+      options: {
+        coverageFolder: 'coverage',
+        mask: '**/**/*.spec.js',
+        root: 'api/',
+        mochaOptions: ['test/bootstrap.spec.js']
+      }
+      }
+    },
+    jshint: {
+      all: ['api/**/*.js', 'test/**/**/*.spec.js']
+    },
+    coveralls: {
+      ci: {
+        src: 'coverage/lcov.info'
+      }
+    }
+  });
 
-	// Load the include-all library in order to require all of our grunt
-	// configurations and task registrations dynamically.
-	var includeAll;
-	try {
-		includeAll = require('include-all');
-	} catch (e0) {
-		try {
-			includeAll = require('sails/node_modules/include-all');
-		}
-		catch(e1) {
-			console.error('Could not find `include-all` module.');
-			console.error('Skipping grunt tasks...');
-			console.error('To fix this, please run:');
-			console.error('npm install include-all --save`');
-			console.error();
+  // Load the include-all library in order to require all of our grunt
+  // configurations and task registrations dynamically.
+  var includeAll;
+  try {
+    includeAll = require('include-all');
+  } catch (e0) {
+    try {
+      includeAll = require('sails/node_modules/include-all');
+    }
+    catch(e1) {
+      console.error('Could not find `include-all` module.');
+      console.error('Skipping grunt tasks...');
+      console.error('To fix this, please run:');
+      console.error('npm install include-all --save`');
+      console.error();
 
-			grunt.registerTask('default', []);
-			return;
-		}
-	}
-
-
-	/**
-	 * Loads Grunt configuration modules from the specified
-	 * relative path. These modules should export a function
-	 * that, when run, should either load/configure or register
-	 * a Grunt task.
-	 */
-	function loadTasks(relPath) {
-		return includeAll({
-			dirname: require('path').resolve(__dirname, relPath),
-			filter: /(.+)\.js$/
-		}) || {};
-	}
-
-	/**
-	 * Invokes the function from a Grunt configuration module with
-	 * a single argument - the `grunt` object.
-	 */
-	function invokeConfigFn(tasks) {
-		for (var taskName in tasks) {
-			if (tasks.hasOwnProperty(taskName)) {
-				tasks[taskName](grunt);
-			}
-		}
-	}
+      grunt.registerTask('default', []);
+      return;
+    }
+  }
 
 
+  /**
+   * Loads Grunt configuration modules from the specified
+   * relative path. These modules should export a function
+   * that, when run, should either load/configure or register
+   * a Grunt task.
+   */
+  function loadTasks(relPath) {
+    return includeAll({
+      dirname: require('path').resolve(__dirname, relPath),
+      filter: /(.+)\.js$/
+    }) || {};
+  }
+
+  /**
+   * Invokes the function from a Grunt configuration module with
+   * a single argument - the `grunt` object.
+   */
+  function invokeConfigFn(tasks) {
+    for (var taskName in tasks) {
+      if (tasks.hasOwnProperty(taskName)) {
+        tasks[taskName](grunt);
+      }
+    }
+  }
 
 
-	// Load task functions
-	var taskConfigurations = loadTasks('./tasks/config'),
-		registerDefinitions = loadTasks('./tasks/register');
 
-	// (ensure that a default task exists)
-	if (!registerDefinitions.default) {
-		registerDefinitions.default = function (grunt) { grunt.registerTask('default', []); };
-	}
 
-	// Run task functions to configure Grunt.
-	invokeConfigFn(taskConfigurations);
-	invokeConfigFn(registerDefinitions);
+  // Load task functions
+  var taskConfigurations = loadTasks('./tasks/config'),
+    registerDefinitions = loadTasks('./tasks/register');
 
-	// Adds "grunt-mocha-istanbul" npm task
-	grunt.loadNpmTasks('grunt-mocha-istanbul');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-coveralls');
+  // (ensure that a default task exists)
+  if (!registerDefinitions.default) {
+    registerDefinitions.default = function (grunt) { grunt.registerTask('default', []); };
+  }
 
-	// Adding test task enabling "grunt test" command
-	grunt.registerTask('test', [
-		'jshint:all',
-		'mocha_istanbul:coverage'
-	]);
-	
-	grunt.registerTask('ci', [
-		'test',
-		'coveralls:ci'
-	]);
+  // Run task functions to configure Grunt.
+  invokeConfigFn(taskConfigurations);
+  invokeConfigFn(registerDefinitions);
+
+  // Adds "grunt-mocha-istanbul" npm task
+  grunt.loadNpmTasks('grunt-mocha-istanbul');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-coveralls');
+
+  // Adding test task enabling "grunt test" command
+  grunt.registerTask('test', [
+    'jshint:all',
+    'mocha_istanbul:coverage'
+  ]);
+  
+  grunt.registerTask('ci', [
+    'test',
+    'coveralls:ci'
+  ]);
 };

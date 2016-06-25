@@ -7,63 +7,82 @@
 
 module.exports = {
   attributes: {
-	player: {
-		model: 'players'
-	},
-	game: {
-		model: 'games'
-	},
-	team: {
-		model: 'teams'
-	},
-	goals: {
-		type: 'integer'
-	},
-	assists: {
-		type: 'integer'
-	},
-	hockeyAssists: {
-		type: 'integer'
-	},
-	blocks: {
-		type: 'integer'
-	},
-	throws: {
-		type: 'integer'
-	},
-	throwaways: {
-		type: 'integer'
-	},
-	throwsIntoBlocks: {
-		type: 'integer'
-	},
-	catches: {
-		type: 'integer'
-	},
-	callahans: {
-		type: 'integer'
-	},
-	drops: {
-		type: 'integer'
-	},
-	fouls: {
-		type: 'integer'
-	},
-	travels: {
-		type: 'integer'
-	},
-	stalls: {
-		type: 'integer'
-	},
-	offensivePossessions: {
-		type: 'integer'
-	},
-	offensivePointsPlayed: {
-		type: 'integer'
-	},
-	defensivePointsPlayed: {
-		type: 'integer'
-	}
+  player: {
+    model: 'players',
+    required: true
+  },
+  game: {
+    model: 'games',
+    required: true
+  },
+  team: {
+    model: 'teams',
+    required: true
+  },
+  goals: {
+    type: 'integer',
+    required: true
+  },
+  assists: {
+    type: 'integer',
+    required: true
+  },
+  hockeyAssists: {
+    type: 'integer',
+    required: true
+  },
+  blocks: {
+    type: 'integer',
+    required: true
+  },
+  throws: {
+    type: 'integer',
+    required: true
+  },
+  throwaways: {
+    type: 'integer',
+    required: true
+  },
+  throwsIntoBlocks: {
+    type: 'integer',
+    required: true
+  },
+  catches: {
+    type: 'integer',
+    required: true
+  },
+  callahans: {
+    type: 'integer',
+    required: true
+  },
+  drops: {
+    type: 'integer',
+    required: true
+  },
+  fouls: {
+    type: 'integer',
+    required: true
+  },
+  travels: {
+    type: 'integer',
+    required: true
+  },
+  stalls: {
+    type: 'integer',
+    required: true
+  },
+  offensivePossessions: {
+    type: 'integer',
+    required: true
+  },
+  offensivePointsPlayed: {
+    type: 'integer',
+    required: true
+  },
+  defensivePointsPlayed: {
+    type: 'integer',
+    required: true
+  }
   }
 };
 

@@ -8,25 +8,28 @@
 module.exports = {
   attributes: {
     name: {
-      type: 'string'
+      type: 'string',
+      required: true
     },
     
     city: {
-      type: 'string'
+      type: 'string',
+      required: true
     },
     
     color: {
-	  type: 'string'
-	},
+      type: 'string'
+    },
     
     players: {
       collection: 'players',
+      via: 'team'
     },
     
     mluApiId: {
-	  type: 'string',
-	  unique: true
-	}
+    type: 'string',
+    unique: true
+  }
   }
 };
 

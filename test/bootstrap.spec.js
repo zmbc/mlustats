@@ -1,5 +1,8 @@
-var sails = require('sails');
-var Barrels = require('barrels');
+var sails = require('sails'),
+  Barrels = require('barrels');
+global.sinon = require('sinon');
+global.should = require('should');
+global.request = require('supertest');
 
 before(function(done) {
 
@@ -7,13 +10,13 @@ before(function(done) {
   this.timeout(20000);
 
   sails.lift({
-	  log: {
-		level: 'error'
-	  },
-	  models: {
-		connection: 'test',
-		migrate: 'drop'
-	  }
+      log: {
+      level: 'error'
+    },
+      models: {
+      connection: 'test',
+      migrate: 'drop'
+    }
   }, function(err, server) {
     if (err) return done(err);
     

@@ -7,18 +7,20 @@
 
 module.exports = {
   attributes: {
-	  homeTeam: {
-		  model: 'teams'
-	  },
-	  
-	  awayTeam: {
-		  model: 'teams'
-	  },
-	  
-	  mluApiId: {
-		  type: 'string',
-		  unique: true
-	  }
+    homeTeam: {
+      model: 'teams',
+      required: true
+    },
+    
+    awayTeam: {
+      model: 'teams',
+      required: true
+    },
+    
+    mluApiId: {
+      type: 'string',
+      unique: true
+    }
   }
 };
 
