@@ -1,3 +1,5 @@
+var request = require('request');
+
 self = module.exports = {
   _maxSeasonAndWeek: function(schedule) {
     var result = {season: 0, week: 0};
