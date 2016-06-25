@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-	- "node"
-	- "iojs"
-	- "6"
-	- "5"
-	- "4"
+  - "node"
+  - "iojs"
+  - "6"
+  - "5"
+  - "4"
 script: "grunt ci"
