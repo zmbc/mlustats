@@ -17,14 +17,14 @@ describe('PlayersController', function () {
 			request(sails.hooks.http.app)
 				.get('/player/1')
 				.expect(200)
-				.end(done)
+				.end(done);
 		});
 		
 		it("should 400 if player doesn't exist", function(done) {
 			request(sails.hooks.http.app)
 				.get('/player/1000000')
 				.expect(404)
-				.end(done)
+				.end(done);
 		});
 	});
 });

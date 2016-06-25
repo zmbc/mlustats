@@ -7,7 +7,7 @@
 
 module.exports = {
 	view: function(req, res) {		
-		Players.findOne(req.params['id'])
+		Players.findOne(req.params.id)
 			.populate('team')
 			.exec(function(err, playerRecord) {
 				if (typeof playerRecord === 'undefined' || playerRecord === null) {

@@ -38,6 +38,8 @@
   "license": "",
   "devDependencies": {
     "barrels": "^1.6.4",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-coveralls": "^1.0.1",
     "grunt-mocha-istanbul": "^5.0.1",
     "istanbul": "^0.4.4",
     "mocha": "^2.5.3",

@@ -25,6 +25,14 @@ module.exports = function(grunt) {
 			  mochaOptions: ['test/bootstrap.spec.js']
 			}
 		  }
+		},
+		jshint: {
+			all: ['api/**/*.js', 'test/**/**/*.spec.js']
+		},
+		coveralls: {
+			ci: {
+				src: 'coverage/lcov.info'
+			}
 		}
 	});
 
@@ -93,9 +101,17 @@ module.exports = function(grunt) {
 
 	// Adds "grunt-mocha-istanbul" npm task
 	grunt.loadNpmTasks('grunt-mocha-istanbul');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-coveralls');
 
 	// Adding test task enabling "grunt test" command
 	grunt.registerTask('test', [
-	  'mocha_istanbul:coverage'
+		'jshint:all',
+		'mocha_istanbul:coverage'
+	]);
+	
+	grunt.registerTask('ci', [
+		'test',
+		'coveralls:ci'
 	]);
 };
