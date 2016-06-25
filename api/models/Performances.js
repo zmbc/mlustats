@@ -7,66 +7,66 @@
 
 module.exports = {
   attributes: {
-  player: {
-    model: 'players',
-    required: true
-  },
-  game: {
-    model: 'games',
-    required: true
-  },
-  team: {
-    model: 'teams',
-    required: true
-  },
-  goals: {
-    type: 'integer'
-  },
-  assists: {
-    type: 'integer'
-  },
-  hockeyAssists: {
-    type: 'integer'
-  },
-  blocks: {
-    type: 'integer'
-  },
-  throws: {
-    type: 'integer'
-  },
-  throwaways: {
-    type: 'integer'
-  },
-  throwsIntoBlocks: {
-    type: 'integer'
-  },
-  catches: {
-    type: 'integer'
-  },
-  callahans: {
-    type: 'integer'
-  },
-  drops: {
-    type: 'integer'
-  },
-  fouls: {
-    type: 'integer'
-  },
-  travels: {
-    type: 'integer'
-  },
-  stalls: {
-    type: 'integer'
-  },
-  offensivePossessions: {
-    type: 'integer'
-  },
-  offensivePointsPlayed: {
-    type: 'integer'
-  },
-  defensivePointsPlayed: {
-    type: 'integer'
-  }
+    player: {
+      model: 'players',
+      required: true
+    },
+    game: {
+      model: 'games',
+      required: true
+    },
+    team: {
+      model: 'teams',
+      required: true
+    },
+    goals: {
+      type: 'integer'
+    },
+    assists: {
+      type: 'integer'
+    },
+    hockeyAssists: {
+      type: 'integer'
+    },
+    blocks: {
+      type: 'integer'
+    },
+    throws: {
+      type: 'integer'
+    },
+    throwaways: {
+      type: 'integer'
+    },
+    throwsIntoBlocks: {
+      type: 'integer'
+    },
+    catches: {
+      type: 'integer'
+    },
+    callahans: {
+      type: 'integer'
+    },
+    drops: {
+      type: 'integer'
+    },
+    fouls: {
+      type: 'integer'
+    },
+    travels: {
+      type: 'integer'
+    },
+    stalls: {
+      type: 'integer'
+    },
+    offensivePossessions: {
+      type: 'integer'
+    },
+    offensivePointsPlayed: {
+      type: 'integer'
+    },
+    defensivePointsPlayed: {
+      type: 'integer'
+    }
   }
 };
 
