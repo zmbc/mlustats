@@ -35,6 +35,10 @@ module.exports.routes = {
   '/': {
 	  view: 'homepage'
   },
+  'get /admin': {
+    controller: 'NgAdminController',
+    action: 'index'
+  },
   '/player/:id' : {
 	  controller: 'PlayersController',
 	  action: 'view'
