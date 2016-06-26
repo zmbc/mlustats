@@ -43,7 +43,9 @@ self = module.exports = {
             performanceRecord.assists = data.Assists;
             performanceRecord.hockeyAssists = data.HockeyAssists;
             performanceRecord.blocks = data.Blocks;
+            performanceRecord.bookends = data.Bookends;
             performanceRecord.throws = data.Throws;
+            performanceRecord.completions = data.Completions;
             performanceRecord.throwaways = data.Throwaways;
             performanceRecord.throwsIntoBlocks = data.ThrowIntoBlocks;
             performanceRecord.catches = data.Catches;
@@ -91,7 +93,7 @@ self = module.exports = {
               function(err, gameRecord) {
                 var homePerformances = gameObj[5];
                 var awayPerformances = gameObj[6];
-                
+
                 var numberParallel = homePerformances.length + awayPerformances.length;
                 var numberDone = 0;
                 
@@ -144,6 +146,10 @@ self = module.exports = {
           games = schedule;
         }
         
+        games = games.filter(function(gameObj) {
+          return gameObj.Status === 'Final';
+        });
+
         var numberParallel = games.length;
         var numberDone = 0;
     

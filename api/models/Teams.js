@@ -26,10 +26,15 @@ module.exports = {
       via: 'team'
     },
     
+    performances: {
+      collection: 'performances',
+      via: 'team'
+    },
+
     mluApiId: {
-    type: 'string',
-    unique: true
-  }
+      type: 'string',
+      unique: true
+    }
   }
 };
 

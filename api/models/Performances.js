@@ -31,7 +31,13 @@ module.exports = {
     blocks: {
       type: 'integer'
     },
+    bookends: {
+      type: 'integer'
+    },
     throws: {
+      type: 'integer'
+    },
+    completions: {
       type: 'integer'
     },
     throwaways: {
