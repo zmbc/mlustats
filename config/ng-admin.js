@@ -60,4 +60,63 @@ module.exports.ngAdmin = {
    * }
    *
    */
+
+   models: {
+    players: {
+      fields: {
+        name: {},
+        team: {
+          targetField: 'name'
+        },
+        mluApiId: {}
+      }
+    },
+    games: {
+      fields: {
+        homeTeam: {
+         targetField: 'name'
+        },
+        awayTeam: {
+         targetField: 'name'
+        },
+        mluApiId: {}
+      }
+    },
+    performances: {
+      fields: {
+        player: {},
+        game: {},
+        team: {
+          targetField: 'name'
+        },
+        goals: {},
+        assists: {},
+        hockeyAssists: {},
+        blocks: {},
+        bookends: {},
+        throws: {},
+        completions: {},
+        throwaways: {},
+        throwsIntoBlocks: {},
+        catches: {},
+        callahans: {},
+        drops: {},
+        fouls: {},
+        travels: {},
+        stalls: {},
+        offensivePossessions: {},
+        offensivePointsPlayed: {},
+        defensivePointsPlayed: {}
+      }
+    },
+    teams: {
+      name: {},
+      city: {},
+      color: {},
+      players: {
+        targetField: 'name'
+      },
+      mluApiId: {}
+    }
+  }
 };
