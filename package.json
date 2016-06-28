@@ -1,5 +1,5 @@
 {
-  "name": "testProject",
+  "name": "mluStats",
   "private": true,
   "version": "0.0.0",
   "description": "a Sails application",
@@ -32,9 +32,9 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/zebburkeconte/testProject.git"
+    "url": "git://github.com/zmbc/mlustats.git"
   },
-  "author": "zebburkeconte",
+  "author": "zmbc",
   "license": "",
   "devDependencies": {
     "barrels": "^1.6.4",
