@@ -66,6 +66,9 @@ self = module.exports = {
     });
   },
   _createModelsFromGame: function(gameObj, callback) {
+    var homeTeam;
+    var awayTeam;
+
     Teams.findOrCreate(
       {mluApiId: gameObj[1][0].HomeTeamID},
       {
@@ -73,62 +76,67 @@ self = module.exports = {
         name: gameObj[0][0].HomeTeam,
         city: gameObj[0][0].HomeTeamCity,
         color: gameObj[0][0].HomeTeamColor
-      },
-      function(err, homeTeamRecord) {          
-        Teams.findOrCreate(
-          {mluApiId: gameObj[2][0].AwayTeamID},
-          {
-            mluApiId: gameObj[2][0].AwayTeamID,
-            name: gameObj[0][0].AwayTeam,
-            city: gameObj[0][0].AwayTeamCity,
-            color: gameObj[0][0].AwayTeamColor
-          },
-          function(err, awayTeamRecord) {
-            Games.findOrCreate(
-              {
-                mluApiId: gameObj[0][0].ga_id_pk,
-                homeTeam: homeTeamRecord.id,
-                awayTeam: awayTeamRecord.id
-              },
-              function(err, gameRecord) {
-                var homePerformances = gameObj[5];
-                var awayPerformances = gameObj[6];
+      }, findOrCreateAwayTeam);
 
-                var numberParallel = homePerformances.length + awayPerformances.length;
-                var numberDone = 0;
-                
-                homePerformances.forEach(function(element, index, array) {
-                  self._makePerformanceFromData(element, homeTeamRecord, gameRecord, function(err, record) {
-                    if (err) {
-                      callback(err);
-                    }
-                    
-                    numberDone++;
-                    console.log(numberDone + ' of ' + numberParallel + ' performances complete');
-                    
-                    if (numberDone === numberParallel) {
-                      callback();
-                    }
-                  });
-                });
-                
-                awayPerformances.forEach(function(element, index, array) {
-                  self._makePerformanceFromData(element, awayTeamRecord, gameRecord, function(err, record) {
-                    if (err) {
-                      callback(err);
-                    }
-                    
-                    numberDone++;
-                    console.log(numberDone + ' of ' + numberParallel + ' performances complete');
-                    
-                    if (numberDone === numberParallel) {
-                      callback();
-                    }
-                  });
-                });
-            });
-        }); 
-    });
+    function findOrCreateAwayTeam(err, homeTeamRecord) {
+      homeTeam = homeTeamRecord;
+      Teams.findOrCreate(
+        {mluApiId: gameObj[2][0].AwayTeamID},
+        {
+          mluApiId: gameObj[2][0].AwayTeamID,
+          name: gameObj[0][0].AwayTeam,
+          city: gameObj[0][0].AwayTeamCity,
+          color: gameObj[0][0].AwayTeamColor
+        }, findOrCreateGame);
+    }
+
+    function findOrCreateGame(err, awayTeamRecord) {
+      awayTeam = awayTeamRecord;
+      Games.findOrCreate(
+        {
+          mluApiId: gameObj[0][0].ga_id_pk,
+          homeTeam: homeTeam.id,
+          awayTeam: awayTeam.id
+        }, makePerformances);
+    }
+
+    function makePerformances(err, gameRecord) {
+      var homePerformances = gameObj[5];
+      var awayPerformances = gameObj[6];
+
+      var numberParallel = homePerformances.length + awayPerformances.length;
+      var numberDone = 0;
+
+      homePerformances.forEach(function(element, index, array) {
+        self._makePerformanceFromData(element, homeTeam, gameRecord, function(err, record) {
+          if (err) {
+            callback(err);
+          }
+
+          numberDone++;
+          console.log(numberDone + ' of ' + numberParallel + ' performances complete');
+
+          if (numberDone === numberParallel) {
+            callback();
+          }
+        });
+      });
+
+      awayPerformances.forEach(function(element, index, array) {
+        self._makePerformanceFromData(element, awayTeam, gameRecord, function(err, record) {
+          if (err) {
+            callback(err);
+          }
+
+          numberDone++;
+          console.log(numberDone + ' of ' + numberParallel + ' performances complete');
+
+          if (numberDone === numberParallel) {
+            callback();
+          }
+        });
+      });
+    }
   },
   scrapeWeek: function(seasonAndWeek, callback) {
     var request = require('request');
