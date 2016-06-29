@@ -65,7 +65,7 @@ self = module.exports = {
         });
     });
   },
-  _createModelsFromGame: function(gameObj, callback) {
+  _createModelsFromGame: function(gameObj, season, week, callback) {
     var homeTeam;
     var awayTeam;
 
@@ -96,7 +96,8 @@ self = module.exports = {
         {
           mluApiId: gameObj[0][0].ga_id_pk,
           homeTeam: homeTeam.id,
-          awayTeam: awayTeam.id
+          awayTeam: awayTeam.id,
+          week: week.id
         }, makePerformances);
     }
 
@@ -160,24 +161,28 @@ self = module.exports = {
 
         var numberParallel = games.length;
         var numberDone = 0;
-    
-        games.forEach(function(element, index, array) {
-          request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-              var gameData = JSON.parse(body).data;
-              self._createModelsFromGame(gameData, function(err) {
-                if (err) {
-                  callback(err);
-                }
-                
-                numberDone++;
-                console.log(numberDone + ' of ' + numberParallel + ' games complete');
-                
-                if (numberDone === numberParallel) {
-                  callback();
+        
+        Seasons.findOrCreate({mluApiId: seasonAndWeek.season}, function(err, seasonRecord) {
+          Weeks.findOrCreate({season: seasonRecord.id, weekNum: seasonAndWeek.week}, function(err, weekRecord) {
+            games.forEach(function(element, index, array) {
+              request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
+                if (!error && response.statusCode == 200) {
+                  var gameData = JSON.parse(body).data;
+                  self._createModelsFromGame(gameData, seasonRecord, weekRecord, function(err) {
+                    if (err) {
+                      callback(err);
+                    }
+                    
+                    numberDone++;
+                    console.log(numberDone + ' of ' + numberParallel + ' games complete');
+                    
+                    if (numberDone === numberParallel) {
+                      callback();
+                    }
+                  });
                 }
               });
-            }
+            });
           });
         });
       }

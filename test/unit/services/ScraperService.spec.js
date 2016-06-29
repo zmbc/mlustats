@@ -288,6 +288,9 @@ describe('ScraperService', function() {
           }
         ]
       ],
+      // Season and week
+      {id: 1},
+      {id: 1},
       function() {
         Teams
           .find({name: {'!': 'Fake Team'}})

@@ -1,30 +1,24 @@
 /**
- * Game.js
+ * Weeks.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
 module.exports = {
+
   attributes: {
-    homeTeam: {
-      model: 'teams',
+    season: {
+      model: 'seasons',
       required: true
     },
-    
-    awayTeam: {
-      model: 'teams',
+    weekNum: {
+      type: 'integer',
       required: true
     },
-    
-    week: {
-      model: 'weeks',
-      required: true
-    },
-    
-    mluApiId: {
-      type: 'string',
-      unique: true
+    games: {
+      collection: 'games',
+      via: 'week'
     }
   }
 };
