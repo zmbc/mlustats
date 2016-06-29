@@ -162,9 +162,10 @@ self = module.exports = {
         var numberParallel = games.length;
         var numberDone = 0;
         
-        Seasons.findOrCreate({mluApiId: seasonAndWeek.season}, function(err, seasonRecord) {
-          Weeks.findOrCreate({season: seasonRecord.id, weekNum: seasonAndWeek.week}, function(err, weekRecord) {
-            games.forEach(function(element, index, array) {
+
+        games.forEach(function(element, index, array) {
+          Seasons.findOrCreate({mluApiId: element.SeasonID}, function(err, seasonRecord) {
+            Weeks.findOrCreate({season: seasonRecord.id, weekNum: element.Week}, function(err, weekRecord) {
               request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
                 if (!error && response.statusCode == 200) {
                   var gameData = JSON.parse(body).data;
