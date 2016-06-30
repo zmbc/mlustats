@@ -20,4 +20,11 @@
  */
 
 module.exports.connections = {
+  travis: {
+    adapter: 'sails-mysql',
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'mlustats'
+  }
 };

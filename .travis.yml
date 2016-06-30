@@ -5,4 +5,8 @@ node_js:
   - "6"
   - "5"
   - "4"
+services:
+  - mysql
+before_script:
+  - mysql -e "create database IF NOT EXISTS mlustats;" -uroot
 script: "grunt ci"

@@ -14,7 +14,7 @@ before(function(done) {
       level: 'error'
     },
       models: {
-      connection: 'test',
+      connection: (process.env.TRAVIS === 'true' ? 'travis' : 'test'),
       migrate: 'drop'
     }
   }, function(err, server) {
