@@ -91,10 +91,13 @@ describe('The MLU API', function() {
 describe('ScraperService', function() {
   afterEach(function(done) {
     // Clean up after
+    this.timeout(10000);
     Performances.destroy().exec(function(err) {
       Games.destroy().exec(function(err) {
         Teams.destroy({name: {'!': 'Fake Team'}}).exec(function(err) {
-          Players.destroy({name: {'!': 'Fake Name'}}).exec(done);
+          Players.destroy({name: {'!': 'Fake Name'}}).exec(function(err) {
+            Statistics.destroy().exec(done);
+          });
         });
       });
     });
@@ -423,7 +426,74 @@ describe('ScraperService', function() {
                 }
               });
             });
-            done();
+
+            Games.find(teams[0].performances[0].game).populate('week').exec(function(err, game) {
+              game = game[0];
+              Statistics.find().exec(function(err, statsRecords) {
+                // 1 for each player for the season
+                // 1 for each team for the week
+                // 1 for each team for the season
+                // 1 for the whole league for the week
+                // 1 for the whole league for the season
+                statsRecords.length.should.equal(4 + 2 + 2 + 1 + 1);
+
+                var player1Stats = statsRecords
+                  .filter(function(value) {
+                    return value.season ===  game.week.season && value.player === teams[0].players[0].id;
+                  })[0];
+
+                player1Stats.goals.should.equal(7);
+                player1Stats.assists.should.equal(3);
+                player1Stats.hockeyAssists.should.equal(4);
+                player1Stats.blocks.should.equal(0);
+                player1Stats.bookends.should.equal(2);
+                player1Stats.throws.should.equal(18);
+                player1Stats.completions.should.equal(15);
+                player1Stats.catches.should.equal(7);
+                player1Stats.callahans.should.equal(1);
+                player1Stats.drops.should.equal(2);
+                player1Stats.throwaways.should.equal(3);
+                player1Stats.throwsIntoBlocks.should.equal(1);
+                player1Stats.fouls.should.equal(0);
+                player1Stats.travels.should.equal(1);
+                player1Stats.stalls.should.equal(0);
+                player1Stats.offensivePointsPlayed.should.equal(13);
+                player1Stats.defensivePointsPlayed.should.equal(6);
+                player1Stats.offensivePossessions.should.equal(21);
+
+                var awayTeamWeekStats = statsRecords
+                  .filter(function(value) {
+                    console.log('value week ' + value.week);
+                    console.log('game week ' + game.week);
+                    console.log('value team ' + value.team);
+                    console.log('teams zero ' + teams[0].id);
+                    return value.week !== null && value.team !== null && value.week === game.week.id && value.team === teams[0].id;
+                  })[0];
+
+                awayTeamWeekStats.goals.should.equal(18);
+                awayTeamWeekStats.assists.should.equal(7);
+                awayTeamWeekStats.hockeyAssists.should.equal(6);
+                awayTeamWeekStats.blocks.should.equal(3);
+                awayTeamWeekStats.bookends.should.equal(2);
+                awayTeamWeekStats.throws.should.equal(24);
+                awayTeamWeekStats.completions.should.equal(20);
+                awayTeamWeekStats.catches.should.equal(23);
+                awayTeamWeekStats.callahans.should.equal(1);
+                awayTeamWeekStats.drops.should.equal(3);
+                awayTeamWeekStats.throwaways.should.equal(3);
+                awayTeamWeekStats.throwsIntoBlocks.should.equal(3);
+                awayTeamWeekStats.fouls.should.equal(0);
+                awayTeamWeekStats.travels.should.equal(1);
+                awayTeamWeekStats.stalls.should.equal(1);
+                // These are actually decimal values (which shouldn't even exist
+                // in the real world) but close enough.
+                awayTeamWeekStats.offensivePointsPlayed.should.equal(4);
+                awayTeamWeekStats.defensivePointsPlayed.should.equal(1);
+                awayTeamWeekStats.offensivePossessions.should.equal(6);
+
+                done();
+              });
+            });
           });
       });
     });

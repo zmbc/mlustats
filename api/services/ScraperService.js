@@ -18,7 +18,7 @@ self = module.exports = {
       
       return result;
   },
-  _makePerformanceFromData: function(data, teamRecord, gameRecord, callback) {
+  _makePerformanceFromData: function(data, teamRecord, gameRecord, season, callback) {
     Players.findOrCreate(
       {mluApiId: data.PlayerID},
       {
@@ -61,13 +61,18 @@ self = module.exports = {
             
             performanceRecord.offensivePossessions = Math.round(touches / parseFloat(data.TPOP));
             
-            performanceRecord.save(callback);
+            performanceRecord.save(function(err, record) {
+              Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {
+                callback(err, record);
+              });
+            });
         });
     });
   },
   _createModelsFromGame: function(gameObj, season, week, callback) {
     var homeTeam;
     var awayTeam;
+    var game;
 
     Teams.findOrCreate(
       {mluApiId: gameObj[1][0].HomeTeamID},
@@ -109,7 +114,7 @@ self = module.exports = {
       var numberDone = 0;
 
       homePerformances.forEach(function(element, index, array) {
-        self._makePerformanceFromData(element, homeTeam, gameRecord, function(err, record) {
+        self._makePerformanceFromData(element, homeTeam, gameRecord, season, function(err, record) {
           if (err) {
             callback(err);
           }
@@ -118,13 +123,14 @@ self = module.exports = {
           console.log(numberDone + ' of ' + numberParallel + ' performances complete');
 
           if (numberDone === numberParallel) {
-            callback();
+            makeStatistics();
           }
         });
       });
 
       awayPerformances.forEach(function(element, index, array) {
-        self._makePerformanceFromData(element, awayTeam, gameRecord, function(err, record) {
+        game = gameRecord;
+        self._makePerformanceFromData(element, awayTeam, gameRecord, season, function(err, record) {
           if (err) {
             callback(err);
           }
@@ -133,8 +139,22 @@ self = module.exports = {
           console.log(numberDone + ' of ' + numberParallel + ' performances complete');
 
           if (numberDone === numberParallel) {
-            callback();
+            makeStatistics(gameRecord);
           }
+        });
+      });
+    }
+    
+    function makeStatistics() {
+      Statistics.createOrRefresh({week: game.week, season: null, team: homeTeam.id, player: null}, function() {
+        Statistics.createOrRefresh({week: game.week, season: null, team: awayTeam.id, player: null}, function() {
+          Statistics.createOrRefresh({week: game.week, season: null, team: null, player: null}, function() {
+            Statistics.createOrRefresh({week: null, season: season.id, team: homeTeam.id, player: null}, function() {
+              Statistics.createOrRefresh({week: null, season: season.id, team: awayTeam.id, player: null}, function() {
+                Statistics.createOrRefresh({week: null, season: season.id, team: null, player: null}, callback);
+              });
+            });
+          });
         });
       });
     }
