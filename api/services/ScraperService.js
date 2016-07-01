@@ -59,8 +59,50 @@ self = module.exports = {
             
             var touches = data.Throws + data.Stalls + data.Goals;
             
-            performanceRecord.offensivePossessions = Math.round(touches / parseFloat(data.TPOP));
-            
+            performanceRecord.offensivePossessionsPlayed = Math.round(touches / parseFloat(data.TPOP));
+
+            var ose = parseFloat(data.OSE) / 100;
+            var offensiveScores = data.OPointsPlayed * ose;
+            var offensivePlusMinus = Math.round(offensiveScores - (data.OPointsPlayed - offensiveScores));
+            var i = 1;
+
+            while (offensiveScores % 1 > 0.05 && offensiveScores % 1 < 0.95) {
+              if (i > 4) {
+                offensivePlusMinus = null;
+                break;
+              }
+              offensiveScores = (data.OPointsPlayed - i) * ose;
+              offensivePlusMinus = Math.round(offensiveScores - ((data.OPointsPlayed - i) - offensiveScores));
+              i++;
+            }
+
+            if (Number.isNaN(offensivePlusMinus)) {
+              offensivePlusMinus = null;
+            }
+
+            performanceRecord.offensivePlusMinus = offensivePlusMinus;
+
+            var dse = parseFloat(data.DSE) / 100;
+            var defensiveScores = data.DPointsPlayed * dse;
+            var defensivePlusMinus = Math.round(defensiveScores - (data.DPointsPlayed - defensiveScores));
+            var j = 1;
+
+            while (defensiveScores % 1 > 0.05 && defensiveScores % 1 < 0.95) {
+              if (j > 4) {
+                defensivePlusMinus = null;
+                break;
+              }
+              defensiveScores = (data.DPointsPlayed - j) * dse;
+              defensivePlusMinus = Math.round(defensiveScores - ((data.DPointsPlayed - j) - defensiveScores));
+              j++;
+            }
+
+            if (Number.isNaN(defensivePlusMinus)) {
+              defensivePlusMinus = null;
+            }
+
+            performanceRecord.defensivePlusMinus = defensivePlusMinus;
+
             performanceRecord.save(function(err, record) {
               Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {
                 callback(err, record);

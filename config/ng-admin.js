@@ -104,7 +104,7 @@ module.exports.ngAdmin = {
         fouls: {},
         travels: {},
         stalls: {},
-        offensivePossessions: {},
+        offensivePossessionsPlayed: {},
         offensivePointsPlayed: {},
         defensivePointsPlayed: {}
       }

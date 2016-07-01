@@ -64,13 +64,19 @@ module.exports = {
     stalls: {
       type: 'integer'
     },
-    offensivePossessions: {
+    offensivePossessionsPlayed: {
       type: 'integer'
     },
     offensivePointsPlayed: {
       type: 'integer'
     },
     defensivePointsPlayed: {
+      type: 'integer'
+    },
+    offensivePlusMinus: {
+      type: 'integer'
+    },
+    defensivePlusMinus: {
       type: 'integer'
     }
   }

@@ -65,7 +65,7 @@ module.exports = {
     stalls: {
       type: 'integer'
     },
-    offensivePossessions: {
+    offensivePossessionsPlayed: {
       type: 'integer'
     },
     offensivePointsPlayed: {
@@ -73,6 +73,18 @@ module.exports = {
     },
     defensivePointsPlayed: {
       type: 'integer'
+    },
+    offensivePlusMinus: {
+      type: 'integer'
+    },
+    defensivePlusMinus: {
+      type: 'integer'
+    },
+    touches: {
+      type: 'integer'
+    },
+    touchesPerPoss: {
+      type: 'float'
     }
   },
   createOrRefresh: function(opts, cb) {
@@ -89,6 +101,14 @@ module.exports = {
         Statistics.create(opts).exec(cb);
       }
     });
+  },
+  refreshDerivativeStatistics: function(self) {
+    self.touches = self.throws + self.stalls + self.goals;
+    if (typeof self.offensivePossessionsPlayed !== 'undefined' && self.offensivePossessionsPlayed !== null && self.offensivePossessionsPlayed !== 0) {
+      self.touchesPerPoss = self.touches / self.offensivePossessionsPlayed;
+    } else {
+      self.touchesPerPoss = null;
+    }
   },
   scopedPerformances: function(self, cb) {
     var query = 'SELECT * FROM performances ' +
@@ -149,9 +169,11 @@ module.exports = {
       });
       
       var sevenBasedAttrs = [
-        'offensivePossessions',
+        'offensivePossessionsPlayed',
         'offensivePointsPlayed',
-        'defensivePointsPlayed'
+        'defensivePointsPlayed',
+        'offensivePlusMinus',
+        'defensivePlusMinus'
       ];
       
       if (self.player !== null && self.team === null) {
@@ -175,6 +197,8 @@ module.exports = {
         });
       }
       
+      Statistics.refreshDerivativeStatistics(self);
+
       cb();
     });
   },

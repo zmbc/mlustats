@@ -61,6 +61,8 @@ describe('The MLU API', function() {
             performance.TPOP.should.be.type('string');
             performance.OPointsPlayed.should.be.type('number');
             performance.DPointsPlayed.should.be.type('number');
+            performance.OSE.should.be.type('string');
+            performance.DSE.should.be.type('string');
           };
 
           var homePerformances = data[5];
@@ -216,7 +218,9 @@ describe('ScraperService', function() {
             Stalls: 0,
             TPOP: "1.067",
             OPointsPlayed: 16,
-            DPointsPlayed: 3
+            DPointsPlayed: 3,
+            OSE: "50.0",
+            DSE: "50.0"
           },
           {
             PlayerID: 48,
@@ -239,7 +243,9 @@ describe('ScraperService', function() {
             Stalls: 0,
             TPOP: "1.500",
             OPointsPlayed: 4,
-            DPointsPlayed: 14
+            DPointsPlayed: 14,
+            OSE: "25.0",
+            DSE: "41.7"
           }
         ],
         [
@@ -264,7 +270,9 @@ describe('ScraperService', function() {
             Stalls: 0,
             TPOP: "1.190",
             OPointsPlayed: 13,
-            DPointsPlayed: 6
+            DPointsPlayed: 6,
+            OSE: "58.3",
+            DSE: "66.7"
           },
           {
             PlayerID: 67,
@@ -287,7 +295,9 @@ describe('ScraperService', function() {
             Stalls: 1,
             TPOP: "0.783",
             OPointsPlayed: 18,
-            DPointsPlayed: 3
+            DPointsPlayed: 3,
+            OSE: "88.2",
+            DSE: "50.0"
           }
         ]
       ],
@@ -355,7 +365,9 @@ describe('ScraperService', function() {
                     performance.stalls.should.equal(0);
                     performance.offensivePointsPlayed.should.equal(13);
                     performance.defensivePointsPlayed.should.equal(6);
-                    performance.offensivePossessions.should.equal(21);
+                    performance.offensivePossessionsPlayed.should.equal(21);
+                    performance.offensivePlusMinus.should.equal(2);
+                    performance.defensivePlusMinus.should.equal(2);
                   } else {
                     performance.goals.should.equal(11);
                     performance.assists.should.equal(4);
@@ -374,7 +386,9 @@ describe('ScraperService', function() {
                     performance.stalls.should.equal(1);
                     performance.offensivePointsPlayed.should.equal(18);
                     performance.defensivePointsPlayed.should.equal(3);
-                    performance.offensivePossessions.should.equal(23);
+                    performance.offensivePossessionsPlayed.should.equal(23);
+                    performance.offensivePlusMinus.should.equal(13);
+                    performance.defensivePlusMinus.should.equal(0);
                   }
                 }
               });
@@ -402,7 +416,9 @@ describe('ScraperService', function() {
                     performance.stalls.should.equal(0);
                     performance.offensivePointsPlayed.should.equal(16);
                     performance.defensivePointsPlayed.should.equal(3);
-                    performance.offensivePossessions.should.equal(15);
+                    performance.offensivePossessionsPlayed.should.equal(15);
+                    performance.offensivePlusMinus.should.equal(0);
+                    performance.defensivePlusMinus.should.equal(0);
                   } else {
                     performance.goals.should.equal(2);
                     performance.assists.should.equal(9);
@@ -421,7 +437,9 @@ describe('ScraperService', function() {
                     performance.stalls.should.equal(0);
                     performance.offensivePointsPlayed.should.equal(4);
                     performance.defensivePointsPlayed.should.equal(14);
-                    performance.offensivePossessions.should.equal(12);
+                    performance.offensivePossessionsPlayed.should.equal(12);
+                    performance.offensivePlusMinus.should.equal(-2);
+                    performance.defensivePlusMinus.should.equal(-2);
                   }
                 }
               });
@@ -459,14 +477,14 @@ describe('ScraperService', function() {
                 player1Stats.stalls.should.equal(0);
                 player1Stats.offensivePointsPlayed.should.equal(13);
                 player1Stats.defensivePointsPlayed.should.equal(6);
-                player1Stats.offensivePossessions.should.equal(21);
+                player1Stats.offensivePossessionsPlayed.should.equal(21);
+                player1Stats.offensivePlusMinus.should.equal(2);
+                player1Stats.defensivePlusMinus.should.equal(2);
+                player1Stats.touches.should.equal(25);
+                player1Stats.touchesPerPoss.should.be.approximately(25 / 21, 0.01);
 
                 var awayTeamWeekStats = statsRecords
                   .filter(function(value) {
-                    console.log('value week ' + value.week);
-                    console.log('game week ' + game.week);
-                    console.log('value team ' + value.team);
-                    console.log('teams zero ' + teams[0].id);
                     return value.week !== null && value.team !== null && value.week === game.week.id && value.team === teams[0].id;
                   })[0];
 
@@ -489,7 +507,12 @@ describe('ScraperService', function() {
                 // in the real world) but close enough.
                 awayTeamWeekStats.offensivePointsPlayed.should.equal(4);
                 awayTeamWeekStats.defensivePointsPlayed.should.equal(1);
-                awayTeamWeekStats.offensivePossessions.should.equal(6);
+                awayTeamWeekStats.offensivePossessionsPlayed.should.equal(6);
+                awayTeamWeekStats.offensivePlusMinus.should.equal(2);
+                awayTeamWeekStats.defensivePlusMinus.should.equal(0);
+
+                awayTeamWeekStats.touches.should.equal(43);
+                awayTeamWeekStats.touchesPerPoss.should.be.approximately(43 / 6, 0.01);
 
                 done();
               });
