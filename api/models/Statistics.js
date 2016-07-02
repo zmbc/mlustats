@@ -74,6 +74,18 @@ module.exports = {
     defensivePointsPlayed: {
       type: 'integer'
     },
+    offensivePointsScored: {
+      type: 'integer'
+    },
+    offensivePointsScoredOn: {
+      type: 'integer'
+    },
+    defensivePointsScored: {
+      type: 'integer'
+    },
+    defensivePointsScoredOn: {
+      type: 'integer'
+    },
     offensivePlusMinus: {
       type: 'integer'
     },
@@ -103,6 +115,18 @@ module.exports = {
     });
   },
   refreshDerivativeStatistics: function(self) {
+    if (self.offensivePointsScored !== null && typeof self.offensivePointsScored !== 'undefined' &&
+        self.offensivePointsScoredOn !== null && typeof self.offensivePointsScoredOn !== 'undefined') {
+
+      self.offensivePlusMinus = self.offensivePointsScored - self.offensivePointsScoredOn;
+    }
+    
+    if (self.defensivePointsScored !== null && typeof self.defensivePointsScored !== 'undefined' &&
+        self.defensivePointsScoredOn !== null && typeof self.defensivePointsScoredOn !== 'undefined') {
+
+      self.defensivePlusMinus = self.defensivePointsScored - self.defensivePointsScoredOn;
+    }
+    
     self.touches = self.throws + self.stalls + self.goals;
     if (typeof self.offensivePossessionsPlayed !== 'undefined' && self.offensivePossessionsPlayed !== null && self.offensivePossessionsPlayed !== 0) {
       self.touchesPerPoss = self.touches / self.offensivePossessionsPlayed;
@@ -172,8 +196,10 @@ module.exports = {
         'offensivePossessionsPlayed',
         'offensivePointsPlayed',
         'defensivePointsPlayed',
-        'offensivePlusMinus',
-        'defensivePlusMinus'
+        'offensivePointsScored',
+        'offensivePointsScoredOn',
+        'defensivePointsScored',
+        'defensivePointsScoredOn'
       ];
       
       if (self.player !== null && self.team === null) {

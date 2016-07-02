@@ -366,8 +366,10 @@ describe('ScraperService', function() {
                     performance.offensivePointsPlayed.should.equal(13);
                     performance.defensivePointsPlayed.should.equal(6);
                     performance.offensivePossessionsPlayed.should.equal(21);
-                    performance.offensivePlusMinus.should.equal(2);
-                    performance.defensivePlusMinus.should.equal(2);
+                    performance.offensivePointsScored.should.equal(7);
+                    performance.offensivePointsScoredOn.should.equal(5);
+                    performance.defensivePointsScored.should.equal(4);
+                    performance.defensivePointsScoredOn.should.equal(2);
                   } else {
                     performance.goals.should.equal(11);
                     performance.assists.should.equal(4);
@@ -387,8 +389,10 @@ describe('ScraperService', function() {
                     performance.offensivePointsPlayed.should.equal(18);
                     performance.defensivePointsPlayed.should.equal(3);
                     performance.offensivePossessionsPlayed.should.equal(23);
-                    performance.offensivePlusMinus.should.equal(13);
-                    performance.defensivePlusMinus.should.equal(0);
+                    performance.offensivePointsScored.should.equal(15);
+                    performance.offensivePointsScoredOn.should.equal(2);
+                    performance.defensivePointsScored.should.equal(1);
+                    performance.defensivePointsScoredOn.should.equal(1);
                   }
                 }
               });
@@ -417,8 +421,10 @@ describe('ScraperService', function() {
                     performance.offensivePointsPlayed.should.equal(16);
                     performance.defensivePointsPlayed.should.equal(3);
                     performance.offensivePossessionsPlayed.should.equal(15);
-                    performance.offensivePlusMinus.should.equal(0);
-                    performance.defensivePlusMinus.should.equal(0);
+                    performance.offensivePointsScored.should.equal(8);
+                    performance.offensivePointsScoredOn.should.equal(8);
+                    performance.defensivePointsScored.should.equal(1);
+                    performance.defensivePointsScoredOn.should.equal(1);
                   } else {
                     performance.goals.should.equal(2);
                     performance.assists.should.equal(9);
@@ -438,8 +444,10 @@ describe('ScraperService', function() {
                     performance.offensivePointsPlayed.should.equal(4);
                     performance.defensivePointsPlayed.should.equal(14);
                     performance.offensivePossessionsPlayed.should.equal(12);
-                    performance.offensivePlusMinus.should.equal(-2);
-                    performance.defensivePlusMinus.should.equal(-2);
+                    performance.offensivePointsScored.should.equal(1);
+                    performance.offensivePointsScoredOn.should.equal(3);
+                    performance.defensivePointsScored.should.equal(5);
+                    performance.defensivePointsScoredOn.should.equal(7);
                   }
                 }
               });
@@ -478,7 +486,11 @@ describe('ScraperService', function() {
                 player1Stats.offensivePointsPlayed.should.equal(13);
                 player1Stats.defensivePointsPlayed.should.equal(6);
                 player1Stats.offensivePossessionsPlayed.should.equal(21);
+                player1Stats.offensivePointsScored.should.equal(7);
+                player1Stats.offensivePointsScoredOn.should.equal(5);
                 player1Stats.offensivePlusMinus.should.equal(2);
+                player1Stats.defensivePointsScored.should.equal(4);
+                player1Stats.defensivePointsScoredOn.should.equal(2);
                 player1Stats.defensivePlusMinus.should.equal(2);
                 player1Stats.touches.should.equal(25);
                 player1Stats.touchesPerPoss.should.be.approximately(25 / 21, 0.01);
@@ -508,9 +520,12 @@ describe('ScraperService', function() {
                 awayTeamWeekStats.offensivePointsPlayed.should.equal(4);
                 awayTeamWeekStats.defensivePointsPlayed.should.equal(1);
                 awayTeamWeekStats.offensivePossessionsPlayed.should.equal(6);
+                awayTeamWeekStats.offensivePointsScored.should.equal(3);
+                awayTeamWeekStats.offensivePointsScoredOn.should.equal(1);
                 awayTeamWeekStats.offensivePlusMinus.should.equal(2);
-                awayTeamWeekStats.defensivePlusMinus.should.equal(0);
-
+                awayTeamWeekStats.defensivePointsScored.should.equal(1);
+                awayTeamWeekStats.defensivePointsScoredOn.should.equal(0);
+                awayTeamWeekStats.defensivePlusMinus.should.equal(1);
                 awayTeamWeekStats.touches.should.equal(43);
                 awayTeamWeekStats.touchesPerPoss.should.be.approximately(43 / 6, 0.01);
 

@@ -62,46 +62,53 @@ self = module.exports = {
             performanceRecord.offensivePossessionsPlayed = Math.round(touches / parseFloat(data.TPOP));
 
             var ose = parseFloat(data.OSE) / 100;
-            var offensiveScores = data.OPointsPlayed * ose;
-            var offensivePlusMinus = Math.round(offensiveScores - (data.OPointsPlayed - offensiveScores));
+            var offensivePointsScored = data.OPointsPlayed * ose;
+            var offensivePointsScoredOn = data.OPointsPlayed - offensivePointsScored;
             var i = 1;
 
-            while (offensiveScores % 1 > 0.05 && offensiveScores % 1 < 0.95) {
+            while (offensivePointsScored % 1 > 0.05 && offensivePointsScored % 1 < 0.95) {
               if (i > 4) {
-                offensivePlusMinus = null;
+                // This is bad. We should log/email it.
+                offensivePointsScored = null;
+                offensivePointsScoredOn = null;
                 break;
               }
-              offensiveScores = (data.OPointsPlayed - i) * ose;
-              offensivePlusMinus = Math.round(offensiveScores - ((data.OPointsPlayed - i) - offensiveScores));
+              offensivePointsScored = (data.OPointsPlayed - i) * ose;
+              offensivePointsScoredOn = (data.OPointsPlayed - i) - offensivePointsScored;
               i++;
             }
 
-            if (Number.isNaN(offensivePlusMinus)) {
-              offensivePlusMinus = null;
+            if (offensivePointsScored !== null) {
+              performanceRecord.offensivePointsScored = Math.round(offensivePointsScored);
             }
 
-            performanceRecord.offensivePlusMinus = offensivePlusMinus;
+            if (offensivePointsScoredOn !== null) {
+              performanceRecord.offensivePointsScoredOn = Math.round(offensivePointsScoredOn);
+            }
 
             var dse = parseFloat(data.DSE) / 100;
-            var defensiveScores = data.DPointsPlayed * dse;
-            var defensivePlusMinus = Math.round(defensiveScores - (data.DPointsPlayed - defensiveScores));
+            var defensivePointsScored = data.DPointsPlayed * dse;
+            var defensivePointsScoredOn = data.DPointsPlayed - defensivePointsScored;
             var j = 1;
 
-            while (defensiveScores % 1 > 0.05 && defensiveScores % 1 < 0.95) {
+            while (defensivePointsScored % 1 > 0.05 && defensivePointsScored % 1 < 0.95) {
               if (j > 4) {
-                defensivePlusMinus = null;
+                // This is bad. We should log/email it.
+                defensivePointsScored = null;
+                defensivePointsScoredOn = null;
                 break;
               }
-              defensiveScores = (data.DPointsPlayed - j) * dse;
-              defensivePlusMinus = Math.round(defensiveScores - ((data.DPointsPlayed - j) - defensiveScores));
+              defensivePointsScored = (data.DPointsPlayed - j) * dse;
+              defensivePointsScoredOn = (data.DPointsPlayed - j) - defensivePointsScored;
               j++;
             }
 
-            if (Number.isNaN(defensivePlusMinus)) {
-              defensivePlusMinus = null;
+            if (defensivePointsScored !== null) {
+              performanceRecord.defensivePointsScored = Math.round(defensivePointsScored);
             }
-
-            performanceRecord.defensivePlusMinus = defensivePlusMinus;
+            if (defensivePointsScoredOn !== null) {
+              performanceRecord.defensivePointsScoredOn = Math.round(defensivePointsScoredOn);
+            }
 
             performanceRecord.save(function(err, record) {
               Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {

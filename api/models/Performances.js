@@ -73,10 +73,16 @@ module.exports = {
     defensivePointsPlayed: {
       type: 'integer'
     },
-    offensivePlusMinus: {
+    offensivePointsScored: {
       type: 'integer'
     },
-    defensivePlusMinus: {
+    offensivePointsScoredOn: {
+      type: 'integer'
+    },
+    defensivePointsScored: {
+      type: 'integer'
+    },
+    defensivePointsScoredOn: {
       type: 'integer'
     }
   }
