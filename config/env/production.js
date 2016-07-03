@@ -9,7 +9,10 @@
  * any private information to this file!
  *
  */
-
+var path = require('path');
+var pkgJSON = require(path.resolve('package.json'));
+var winston = require('winston');
+require('winston-mail').Mail;
 module.exports = {
 
   /***************************************************************************
@@ -31,8 +34,33 @@ module.exports = {
    * Set the log level in production environment to "silent"                 *
    ***************************************************************************/
 
-  // log: {
-  //   level: "silent"
-  // }
+    log: {
+      level: 'silent',
+      transports: [
+        {
+          module: require('winston-daily-rotate-file'),
+          config: {
+            dirname: path.resolve('logs'),
+            datePattern: '.yyyy-MM-dd.log',
+            filename: pkgJSON.name,
+            prettyPrint: true,
+            timestamp: true,
+            level: 'silly'
+          }
+        },
+        {
+          module: winston.transports.Mail,
+          config: {
+            level: 'warn',
+            to: 'zmbc@uw.edu',
+            host: 'smtp.gmail.com',
+            port: 465,
+            ssl: true,
+            username: process.env.GMAIL_USERNAME,
+            password: process.env.GMAIL_PASSWORD
+          }
+        }
+      ]
+   }
 
 };
