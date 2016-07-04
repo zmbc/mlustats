@@ -486,14 +486,32 @@ describe('ScraperService', function() {
                 player1Stats.offensivePointsPlayed.should.equal(13);
                 player1Stats.defensivePointsPlayed.should.equal(6);
                 player1Stats.offensivePossessionsPlayed.should.equal(21);
+                player1Stats.defensivePossessionsPlayed.should.equal(15);
                 player1Stats.offensivePointsScored.should.equal(7);
                 player1Stats.offensivePointsScoredOn.should.equal(5);
                 player1Stats.offensivePlusMinus.should.equal(2);
                 player1Stats.defensivePointsScored.should.equal(4);
                 player1Stats.defensivePointsScoredOn.should.equal(2);
                 player1Stats.defensivePlusMinus.should.equal(2);
+                player1Stats.plusMinus.should.equal(4);
                 player1Stats.touches.should.equal(25);
+                // Per offensive possession
+                player1Stats.goalsPerPoss.should.be.approximately(7 / 21, 0.01);
+                player1Stats.assistsPerPoss.should.be.approximately(3 / 21, 0.01);
+                player1Stats.hockeyAssistsPerPoss.should.be.approximately(4 / 21, 0.01);
+                player1Stats.throwsPerPoss.should.be.approximately(18 / 21, 0.01);
+                player1Stats.completionsPerPoss.should.be.approximately(15 / 21, 0.01);
+                player1Stats.catchesPerPoss.should.be.approximately(7 / 21, 0.01);
+                player1Stats.dropsPerPoss.should.be.approximately(2 / 21, 0.01);
+                player1Stats.throwawaysPerPoss.should.be.approximately(3 / 21, 0.01);
+                player1Stats.throwsIntoBlocksPerPoss.should.be.approximately(1 / 21, 0.01);
+                player1Stats.travelsPerPoss.should.be.approximately(1 / 21, 0.01);
+                player1Stats.stallsPerPoss.should.be.approximately(0 / 21, 0.01);
                 player1Stats.touchesPerPoss.should.be.approximately(25 / 21, 0.01);
+                // Per defensive possession
+                player1Stats.blocksPerPoss.should.be.approximately(0 / 15, 0.01);
+                player1Stats.callahansPerPoss.should.be.approximately(1 / 15, 0.01);
+                player1Stats.bookendsPerPoss.should.be.approximately(2 / 15, 0.01);
 
                 var awayTeamWeekStats = statsRecords
                   .filter(function(value) {
@@ -520,14 +538,33 @@ describe('ScraperService', function() {
                 awayTeamWeekStats.offensivePointsPlayed.should.equal(4);
                 awayTeamWeekStats.defensivePointsPlayed.should.equal(1);
                 awayTeamWeekStats.offensivePossessionsPlayed.should.equal(6);
+                awayTeamWeekStats.defensivePossessionsPlayed.should.equal(3);
                 awayTeamWeekStats.offensivePointsScored.should.equal(3);
                 awayTeamWeekStats.offensivePointsScoredOn.should.equal(1);
                 awayTeamWeekStats.offensivePlusMinus.should.equal(2);
                 awayTeamWeekStats.defensivePointsScored.should.equal(1);
                 awayTeamWeekStats.defensivePointsScoredOn.should.equal(0);
                 awayTeamWeekStats.defensivePlusMinus.should.equal(1);
+                awayTeamWeekStats.plusMinus.should.equal(3);
                 awayTeamWeekStats.touches.should.equal(43);
+                // Per offensive possession
+                // NB: Some of these are greater than 1 and should never be in the real world.
+                awayTeamWeekStats.goalsPerPoss.should.be.approximately(18 / 6, 0.01);
+                awayTeamWeekStats.assistsPerPoss.should.be.approximately(7 / 6, 0.01);
+                awayTeamWeekStats.hockeyAssistsPerPoss.should.be.approximately(6 / 6, 0.01);
+                awayTeamWeekStats.throwsPerPoss.should.be.approximately(24 / 6, 0.01);
+                awayTeamWeekStats.completionsPerPoss.should.be.approximately(20 / 6, 0.01);
+                awayTeamWeekStats.catchesPerPoss.should.be.approximately(23 / 6, 0.01);
+                awayTeamWeekStats.dropsPerPoss.should.be.approximately(3 / 6, 0.01);
+                awayTeamWeekStats.throwawaysPerPoss.should.be.approximately(3 / 6, 0.01);
+                awayTeamWeekStats.throwsIntoBlocksPerPoss.should.be.approximately(3 / 6, 0.01);
+                awayTeamWeekStats.travelsPerPoss.should.be.approximately(1 / 6, 0.01);
+                awayTeamWeekStats.stallsPerPoss.should.be.approximately(1 / 6, 0.01);
                 awayTeamWeekStats.touchesPerPoss.should.be.approximately(43 / 6, 0.01);
+                // Per defensive possession
+                awayTeamWeekStats.blocksPerPoss.should.be.approximately(3 / 3, 0.01);
+                awayTeamWeekStats.callahansPerPoss.should.be.approximately(1 / 3, 0.01);
+                awayTeamWeekStats.bookendsPerPoss.should.be.approximately(2 / 3, 0.01);
 
                 done();
               });

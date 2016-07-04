@@ -230,7 +230,7 @@ self = module.exports = {
 
         var numberParallel = games.length;
         var numberDone = 0;
-        
+
 
         games.forEach(function(element, index, array) {
           Seasons.findOrCreate({mluApiId: element.SeasonID}, function(err, seasonRecord) {
@@ -242,12 +242,12 @@ self = module.exports = {
                     if (err) {
                       callback(err);
                     }
-                    
+
                     numberDone++;
                     console.log(numberDone + ' of ' + numberParallel + ' games complete');
-                    
+
                     if (numberDone === numberParallel) {
-                      callback();
+                      Statistics.updatePercentiles(callback);
                     }
                   });
                 }

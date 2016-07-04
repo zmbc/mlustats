@@ -92,11 +92,106 @@ module.exports = {
     defensivePlusMinus: {
       type: 'integer'
     },
+    plusMinus: {
+      type: 'integer'
+    },
     touches: {
       type: 'integer'
     },
+    defensivePossessionsPlayed: {
+      type: 'integer'
+    },
+    // Per-possession stats
+    goalsPerPoss: {
+      type: 'float'
+    },
+    assistsPerPoss: {
+      type: 'float'
+    },
+    hockeyAssistsPerPoss: {
+      type: 'float'
+    },
+    throwsPerPoss: {
+      type: 'float'
+    },
+    completionsPerPoss: {
+      type: 'float'
+    },
+    throwawaysPerPoss: {
+      type: 'float'
+    },
+    throwsIntoBlocksPerPoss: {
+      type: 'float'
+    },
+    catchesPerPoss: {
+      type: 'float'
+    },
+    dropsPerPoss: {
+      type: 'float'
+    },
+    travelsPerPoss: {
+      type: 'float'
+    },
+    stallsPerPoss: {
+      type: 'float'
+    },
     touchesPerPoss: {
       type: 'float'
+    },
+    blocksPerPoss: {
+      type: 'float'
+    },
+    callahansPerPoss: {
+      type: 'float'
+    },
+    bookendsPerPoss: {
+      type: 'float'
+    },
+    // Percentiles
+    goalsPerPossPercentile: {
+      type: 'integer'
+    },
+    assistsPerPossPercentile: {
+      type: 'integer'
+    },
+    hockeyAssistsPerPossPercentile: {
+      type: 'integer'
+    },
+    throwsPerPossPercentile: {
+      type: 'integer'
+    },
+    completionsPerPossPercentile: {
+      type: 'integer'
+    },
+    throwawaysPerPossPercentile: {
+      type: 'integer'
+    },
+    throwsIntoBlocksPerPossPercentile: {
+      type: 'integer'
+    },
+    catchesPerPossPercentile: {
+      type: 'integer'
+    },
+    dropsPerPossPercentile: {
+      type: 'integer'
+    },
+    travelsPerPossPercentile: {
+      type: 'integer'
+    },
+    stallsPerPossPercentile: {
+      type: 'integer'
+    },
+    touchesPerPossPercentile: {
+      type: 'integer'
+    },
+    blocksPerPossPercentile: {
+      type: 'integer'
+    },
+    callahansPerPossPercentile: {
+      type: 'integer'
+    },
+    bookendsPerPossPercentile: {
+      type: 'integer'
     }
   },
   createOrRefresh: function(opts, cb) {
@@ -127,11 +222,52 @@ module.exports = {
       self.defensivePlusMinus = self.defensivePointsScored - self.defensivePointsScoredOn;
     }
     
+    if (self.defensivePlusMinus !== null && typeof self.defensivePlusMinus !== 'undefined' &&
+        self.offensivePlusMinus !== null && typeof self.offensivePlusMinus !== 'undefined') {
+
+      self.plusMinus = self.defensivePlusMinus + self.offensivePlusMinus;
+    }
+
+    if (self.offensivePossessionsPlayed !== null && typeof self.offensivePossessionsPlayed !== 'undefined' &&
+        self.offensivePointsScoredOn !== null && typeof self.offensivePointsScoredOn !== 'undefined' &&
+        self.defensivePointsScoredOn !== null && typeof self.defensivePointsScoredOn !== 'undefined') {
+
+      self.defensivePossessionsPlayed = self.offensivePossessionsPlayed - self.offensivePointsPlayed + self.offensivePointsScoredOn + self.defensivePointsScoredOn;
+    }
+
     self.touches = self.throws + self.stalls + self.goals;
-    if (typeof self.offensivePossessionsPlayed !== 'undefined' && self.offensivePossessionsPlayed !== null && self.offensivePossessionsPlayed !== 0) {
-      self.touchesPerPoss = self.touches / self.offensivePossessionsPlayed;
-    } else {
-      self.touchesPerPoss = null;
+    if (self.offensivePossessionsPlayed !== null && typeof self.offensivePossessionsPlayed !== 'undefined' && self.offensivePossessionsPlayed !== 0) {
+      var perOffensivePossessionAttrs = [
+        'goals',
+        'assists',
+        'hockeyAssists',
+        'throws',
+        'completions',
+        'throwaways',
+        'throwsIntoBlocks',
+        'catches',
+        'drops',
+        'travels',
+        'stalls',
+        'touches'
+      ];
+
+      perOffensivePossessionAttrs.forEach(function(attr, index, array) {
+        self[attr + 'PerPoss'] = self[attr] / self.offensivePossessionsPlayed;
+      });
+    }
+
+    if (self.defensivePossessionsPlayed !== null && typeof self.defensivePossessionsPlayed !== 'undefined' && self.defensivePossessionsPlayed !== 0) {
+      var perDefensivePossessionAttrs = [
+        'blocks',
+        'callahans',
+        'bookends'
+        // fouls?
+      ];
+
+      perDefensivePossessionAttrs.forEach(function(attr, index, array) {
+        self[attr + 'PerPoss'] = self[attr] / self.defensivePossessionsPlayed;
+      });
     }
   },
   scopedPerformances: function(self, cb) {
@@ -227,6 +363,84 @@ module.exports = {
 
       cb();
     });
+  },
+  updatePercentiles: function(cb) {
+    Statistics.find().exec(function(err, stats) {
+      Seasons.find().populate('weeks').exec(function(err, seasons) {
+        seasons.forEach(function(season, index, array) {
+          percentileStats(stats.filter(function(elem) { return elem.season === season.id; }));
+
+          season.weeks.forEach(function(week, weekIndex, weekArray) {
+            percentileStats(stats.filter(function(elem) { return elem.week === week.id; }));
+          });
+        });
+
+        var numberDone = 0;
+
+        stats.forEach(function(stat, statIndex, statArray) {
+          stat.save(function(err) {
+            if (err) {
+              cb(err);
+            } else {
+              numberDone++;
+              if (numberDone === statArray.length) {
+                cb();
+              }
+            }
+          });
+        });
+      });
+    });
+
+    function percentileStats(stats) {
+      if (stats === null || typeof stats === 'undefined') {
+        return;
+      }
+      // Attr name mapped to whether they are a bad thing
+      // (meaning less is better)
+      var percentileAttrs = {
+        goalsPerPoss: false,
+        assistsPerPoss: false,
+        hockeyAssistsPerPoss: false,
+        throwsPerPoss: false,
+        completionsPerPoss: false,
+        throwawaysPerPoss: true,
+        throwsIntoBlocksPerPoss: true,
+        catchesPerPoss: false,
+        dropsPerPoss: true,
+        travelsPerPoss: true,
+        stallsPerPoss: true,
+        touchesPerPoss: false,
+        blocksPerPoss: false,
+        callahansPerPoss: false,
+        bookendsPerPoss: false
+      };
+
+      Object.keys(percentileAttrs).forEach(function(attr, index, array) {
+        var compareOnAttr = function(a, b) {
+          if (a[attr] < b[attr]) {
+            if (percentileAttrs[attr]) {
+              return 1;
+            } else {
+              return -1;
+            }
+          } else if (a[attr] > b[attr]) {
+            if (percentileAttrs[attr]) {
+              return -1;
+            } else {
+              return 1;
+            }
+          } else {
+            return 0;
+          }
+        };
+
+        stats.sort(compareOnAttr);
+        stats.forEach(function(stat, statIndex, statArray) {
+          stat[attr + 'Percentile'] = Math.round((statIndex / statArray.length) * 100);
+        });
+      });
+    }
   },
   // Lifecycle callbacks
   beforeCreate: function(self, cb) {
