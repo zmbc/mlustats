@@ -6,7 +6,7 @@ module.exports = function isAdmin (req, res, next) {
       req.query.user === process.env.MLUSTATS_USERNAME &&
       req.query.pass === process.env.MLUSTATS_PASSWORD) {
     
-    next();
+    return next();
   }
   
   return res.notFound();
