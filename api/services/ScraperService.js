@@ -68,7 +68,7 @@ self = module.exports = {
 
             while (offensivePointsScored % 1 > 0.05 && offensivePointsScored % 1 < 0.95) {
               if (i > 4) {
-                // This is bad. We should log/email it.
+                sails.log.warn('Offensive points won/lost cannot be calculated for player ' + data.Player);
                 offensivePointsScored = null;
                 offensivePointsScoredOn = null;
                 break;
@@ -93,7 +93,7 @@ self = module.exports = {
 
             while (defensivePointsScored % 1 > 0.05 && defensivePointsScored % 1 < 0.95) {
               if (j > 4) {
-                // This is bad. We should log/email it.
+                sails.log.warn('Defensive points won/lost cannot be calculated for player ' + data.Player);
                 defensivePointsScored = null;
                 defensivePointsScoredOn = null;
                 break;
