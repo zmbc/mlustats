@@ -1,0 +1,16 @@
+extends ../layout.jade
+
+block body
+  p='His name is ' + player.name + ' and he plays for ' + player.team.name + '.'
+
+  if stats
+    ul
+      li=stats.goalsPerPoss + ' goals per possession'
+      li=stats.assistsPerPoss + ' assists per possession'
+      li=stats.hockeyAssistsPerPoss + ' hockey assists per possession'
+      li=stats.blocksPerPoss + ' blocks per opponent possession'
+      li=stats.touchesPerPoss + ' touches per possession'
+      li=stats.touchesPerPossPercentile + ' percentile'
+      li=stats.offensivePointsPlayed + ' offensive points played'
+      li=stats.defensivePointsPlayed + ' defensive points played'
+      li=stats.touches + ' touches'
