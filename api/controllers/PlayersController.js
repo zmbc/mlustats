@@ -9,13 +9,13 @@ module.exports = {
   view: function(req, res) {
     Players.findOne(req.params.id)
       .populate('team')
-      .populate('performances')
       .exec(function(err, playerRecord) {
         if (typeof playerRecord === 'undefined' || playerRecord === null) {
           res.notFound();
         } else {
-          playerRecord.performances = playerRecord.performances.slice(0, 10);
-          res.view('players/view.ejs', {player: playerRecord});
+          Statistics.findOne({player: playerRecord.id, week: null, season: 1, team: null}).exec(function (err, statsRecord) {
+            res.view('players/view.jade', {player: playerRecord, stats: statsRecord});
+          });
         }
       });
   }
