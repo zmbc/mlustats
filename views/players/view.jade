@@ -1,9 +1,8 @@
 extends ../layout.jade
 
-block body
-
-
-  p='His name is ' + player.name + ' and he plays for ' + player.team.name + '.'
+block content
+  h1=player.name
+  h2=player.team.name
 
   if stats
     ul
