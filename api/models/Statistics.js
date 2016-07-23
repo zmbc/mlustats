@@ -215,13 +215,13 @@ module.exports = {
 
       self.offensivePlusMinus = self.offensivePointsScored - self.offensivePointsScoredOn;
     }
-    
+
     if (self.defensivePointsScored !== null && typeof self.defensivePointsScored !== 'undefined' &&
         self.defensivePointsScoredOn !== null && typeof self.defensivePointsScoredOn !== 'undefined') {
 
       self.defensivePlusMinus = self.defensivePointsScored - self.defensivePointsScoredOn;
     }
-    
+
     if (self.defensivePlusMinus !== null && typeof self.defensivePlusMinus !== 'undefined' &&
         self.offensivePlusMinus !== null && typeof self.offensivePlusMinus !== 'undefined') {
 
@@ -274,7 +274,7 @@ module.exports = {
     var query = 'SELECT * FROM performances ' +
                 'LEFT JOIN games ON performances.game = games.id ' +
                 'LEFT JOIN weeks ON games.week = weeks.id ';
-    
+
     if(self.player !== null && self.team === null) {
       // This is a Statistic for a player
       query += ' WHERE performances.player = ' + self.player;
@@ -282,7 +282,7 @@ module.exports = {
       // This is a Statistic for a team
       query += ' WHERE performances.team = ' + self.team;
     }
-    
+
     if(self.season !== null && self.week === null) {
       // This is a Statistic for a season
       query += ' AND weeks.season = ' + self.season;
@@ -293,7 +293,7 @@ module.exports = {
       }
       query += ' AND weeks.id = ' + self.week;
     }
-    
+
     Performances.query(query, cb);
   },
   refreshStatistics: function(self, cb) {
@@ -301,7 +301,7 @@ module.exports = {
       if (err) {
         cb(err);
       }
-      
+
       var sumAttrs = [
         'goals',
         'assists',
@@ -319,15 +319,15 @@ module.exports = {
         'travels',
         'stalls'
       ];
-      
+
       sumAttrs.forEach(function(attr, index, array) {
         self[attr] = 0;
-        
+
         scopedPerformanceRecords.forEach(function(performance, pIndex, pArray) {
           self[attr] += performance[attr];
         });
       });
-      
+
       var sevenBasedAttrs = [
         'offensivePossessionsPlayed',
         'offensivePointsPlayed',
@@ -337,11 +337,11 @@ module.exports = {
         'defensivePointsScored',
         'defensivePointsScoredOn'
       ];
-      
+
       if (self.player !== null && self.team === null) {
         sevenBasedAttrs.forEach(function(attr, index, array) {
           self[attr] = 0;
-          
+
           scopedPerformanceRecords.forEach(function(performance, pIndex, pArray) {
             self[attr] += performance[attr];
           });
@@ -349,16 +349,16 @@ module.exports = {
       } else if (self.team !== null && self.player === null) {
         sevenBasedAttrs.forEach(function(attr, index, array) {
           self[attr] = 0;
-          
+
           scopedPerformanceRecords.forEach(function(performance, pIndex, pArray) {
             self[attr] += performance[attr];
           });
-          
+
           self[attr] /= 7;
           self[attr] = Math.round(self[attr]);
         });
       }
-      
+
       Statistics.refreshDerivativeStatistics(self);
 
       cb();
@@ -374,6 +374,8 @@ module.exports = {
             percentileStats(stats.filter(function(elem) { return elem.week === week.id; }));
           });
         });
+
+        percentileStats(stats.filter(function(elem) { return elem.season === null && elem.week === null; }));
 
         var numberDone = 0;
 
@@ -447,4 +449,3 @@ module.exports = {
     Statistics.refreshStatistics(self, cb);
   }
 };
-

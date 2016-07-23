@@ -112,7 +112,9 @@ self = module.exports = {
 
             performanceRecord.save(function(err, record) {
               Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {
-                callback(err, record);
+                Statistics.createOrRefresh({week: null, season: null, player: playerRecord.id, team: null}, function() {
+                  callback(err, record);
+                });
               });
             });
         });

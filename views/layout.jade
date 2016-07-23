@@ -54,9 +54,9 @@ html
     script(src="/js/dependencies/sails.io.js")
     script(src="/js/vendor/jquery-2.2.4.js")
     script(src="/js/vendor/chartist/chartist.js")
-
     if clientVars
       script
         each varValue, varName in clientVars
           | var !{varName} = !{JSON.stringify(varValue)};
+    block script
     // SCRIPTS END
