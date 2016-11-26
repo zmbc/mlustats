@@ -33,7 +33,7 @@ module.exports = {
   },
   statistics: function(id) {
     var statsPromise = Statistics.find({player: id, team: null});
-    var performancesPromise = Performances.find({player: id});
+    var performancesPromise = Performances.find({player: id}).populate('game');
 
     return Promise.all([statsPromise, performancesPromise])
       .spread(function(stats, performances) {
