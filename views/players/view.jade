@@ -4,17 +4,21 @@ block content
   h1=player.name
   h2=player.team.name
 
-  ul
-    li=stats.career.goalsPerPoss + ' goals per possession'
-    li=stats.career.assistsPerPoss + ' assists per possession'
-    li=stats.career.hockeyAssistsPerPoss + ' hockey assists per possession'
-    li=stats.career.blocksPerPoss + ' blocks per opponent possession'
-    li=stats.career.touchesPerPoss + ' touches per possession'
-    li=stats.career.touchesPerPossPercentile + ' percentile'
-    li=stats.career.offensivePointsPlayed + ' offensive points played'
-    li=stats.career.defensivePointsPlayed + ' defensive points played'
-    li=stats.career.touches + ' touches'
-  .week-chart
+  if stats.career
+    ul
+      li=stats.career.goalsPerPoss + ' goals per possession'
+      li=stats.career.assistsPerPoss + ' assists per possession'
+      li=stats.career.hockeyAssistsPerPoss + ' hockey assists per possession'
+      li=stats.career.blocksPerPoss + ' blocks per opponent possession'
+      li=stats.career.touchesPerPoss + ' touches per possession'
+      li=stats.career.touchesPerPossPercentile + ' percentile'
+      li=stats.career.offensivePointsPlayed + ' offensive points played'
+      li=stats.career.defensivePointsPlayed + ' defensive points played'
+      li=stats.career.touches + ' touches'
+    .week-chart
+  else
+    p.
+      There are no stats for this player.
 
 block script
   script.
@@ -26,9 +30,9 @@ block script
       return result;
     };
     var data = {
-      labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      labels: map(stats.weeks, function(elem) { return elem.week;}).slice(-5),
       series: [
-        map(stats.weeks, function(elem) { return elem.goals; }).slice(0, 5)
+        map(stats.weeks, function(elem) { return elem.goals; }).slice(-5)
       ]
     };
     var options = {

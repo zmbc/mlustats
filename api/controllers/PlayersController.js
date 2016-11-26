@@ -14,7 +14,7 @@ module.exports = {
 
     Promise.all([playerPromise, statsPromise])
       .spread(function(player, stats) {
-        if (player == null || stats == null) {
+        if (!player) {
           res.notFound();
         } else {
           res.view({player: player, stats: stats, clientVars: {stats: stats}});
