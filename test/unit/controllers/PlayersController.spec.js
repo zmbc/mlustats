@@ -9,7 +9,7 @@ describe('PlayersController', function () {
         .end(done);
     });
     
-    it("should 400 if player doesn't exist", function(done) {
+    it("should 404 if player doesn't exist", function(done) {
       request(sails.hooks.http.app)
         .get('/player/1000000')
         .expect(404)
