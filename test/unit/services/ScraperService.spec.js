@@ -456,12 +456,13 @@ describe('ScraperService', function() {
             Games.find(teams[0].performances[0].game).populate('week').exec(function(err, game) {
               game = game[0];
               Statistics.find().exec(function(err, statsRecords) {
+                // 1 for each player's career
                 // 1 for each player for the season
                 // 1 for each team for the week
                 // 1 for each team for the season
                 // 1 for the whole league for the week
                 // 1 for the whole league for the season
-                statsRecords.length.should.equal(4 + 2 + 2 + 1 + 1);
+                statsRecords.length.should.equal(4 + 4 + 2 + 2 + 1 + 1);
 
                 var player1Stats = statsRecords
                   .filter(function(value) {
