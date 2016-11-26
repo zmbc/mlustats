@@ -27,98 +27,116 @@ self = module.exports = {
         team: teamRecord.id
       },
       function(err, playerRecord) {
-        playerRecord.team = teamRecord.id;
-        playerRecord.save();
-        Performances.findOrCreate(
-          {game: gameRecord.id, player: playerRecord.id},
-          {
-            game: gameRecord.id,
-            player: playerRecord.id,
-            team: teamRecord.id
-          },
-          function(err, performanceRecord) {
-            performanceRecord.team = teamRecord.id;
-            
-            performanceRecord.goals = data.Goals;
-            performanceRecord.assists = data.Assists;
-            performanceRecord.hockeyAssists = data.HockeyAssists;
-            performanceRecord.blocks = data.Blocks;
-            performanceRecord.bookends = data.Bookends;
-            performanceRecord.throws = data.Throws;
-            performanceRecord.completions = data.Completions;
-            performanceRecord.throwaways = data.Throwaways;
-            performanceRecord.throwsIntoBlocks = data.ThrowIntoBlocks;
-            performanceRecord.catches = data.Catches;
-            performanceRecord.callahans = data.Callahans;
-            performanceRecord.drops = data.Drops;
-            performanceRecord.fouls = data.Fouls;
-            performanceRecord.travels = data.Travels;
-            performanceRecord.stalls = data.Stalls;
-            performanceRecord.offensivePointsPlayed = data.OPointsPlayed;
-            performanceRecord.defensivePointsPlayed = data.DPointsPlayed;
-            
-            var touches = data.Throws + data.Stalls + data.Goals;
-            
-            performanceRecord.offensivePossessionsPlayed = Math.round(touches / parseFloat(data.TPOP));
-
-            var ose = parseFloat(data.OSE) / 100;
-            var offensivePointsScored = data.OPointsPlayed * ose;
-            var offensivePointsScoredOn = data.OPointsPlayed - offensivePointsScored;
-            var i = 1;
-
-            while (offensivePointsScored % 1 > 0.05 && offensivePointsScored % 1 < 0.95) {
-              if (i > 4) {
-                sails.log.warn('Offensive points won/lost cannot be calculated for player ' + data.Player);
-                offensivePointsScored = null;
-                offensivePointsScoredOn = null;
-                break;
-              }
-              offensivePointsScored = (data.OPointsPlayed - i) * ose;
-              offensivePointsScoredOn = (data.OPointsPlayed - i) - offensivePointsScored;
-              i++;
+        if (err) {
+          Players.findOne({mluApiId: data.PlayerID}, function(err, playerRecord) {
+            if (err) {
+              throw err;
+            } else {
+              makePerformance(playerRecord);
             }
+          });
+        } else {
+          makePerformance(playerRecord);
+        }
+    });
 
-            if (offensivePointsScored !== null) {
-              performanceRecord.offensivePointsScored = Math.round(offensivePointsScored);
+    function makePerformance(playerRecord) {
+      playerRecord.team = teamRecord.id;
+      playerRecord.save();
+      Performances.findOrCreate(
+        {game: gameRecord.id, player: playerRecord.id},
+        {
+          game: gameRecord.id,
+          player: playerRecord.id,
+          team: teamRecord.id
+        },
+        function(err, performanceRecord) {
+          if (err) {
+            throw err;
+          }
+
+          performanceRecord.team = teamRecord.id;
+
+          performanceRecord.goals = data.Goals;
+          performanceRecord.assists = data.Assists;
+          performanceRecord.hockeyAssists = data.HockeyAssists;
+          performanceRecord.blocks = data.Blocks;
+          performanceRecord.bookends = data.Bookends;
+          performanceRecord.throws = data.Throws;
+          performanceRecord.completions = data.Completions;
+          performanceRecord.throwaways = data.Throwaways;
+          performanceRecord.throwsIntoBlocks = data.ThrowIntoBlocks;
+          performanceRecord.catches = data.Catches;
+          performanceRecord.callahans = data.Callahans;
+          performanceRecord.drops = data.Drops;
+          performanceRecord.fouls = data.Fouls;
+          performanceRecord.travels = data.Travels;
+          performanceRecord.stalls = data.Stalls;
+          performanceRecord.offensivePointsPlayed = data.OPointsPlayed;
+          performanceRecord.defensivePointsPlayed = data.DPointsPlayed;
+
+          var touches = data.Throws + data.Stalls + data.Goals;
+
+          performanceRecord.offensivePossessionsPlayed = Math.round(touches / parseFloat(data.TPOP));
+
+          var ose = parseFloat(data.OSE) / 100;
+          var offensivePointsScored = data.OPointsPlayed * ose;
+          var offensivePointsScoredOn = data.OPointsPlayed - offensivePointsScored;
+          var i = 1;
+
+          while (offensivePointsScored % 1 > 0.05 && offensivePointsScored % 1 < 0.95) {
+            if (i > 4) {
+              sails.log.warn('Offensive points won/lost cannot be calculated for player ' + data.Player);
+              offensivePointsScored = null;
+              offensivePointsScoredOn = null;
+              break;
             }
+            offensivePointsScored = (data.OPointsPlayed - i) * ose;
+            offensivePointsScoredOn = (data.OPointsPlayed - i) - offensivePointsScored;
+            i++;
+          }
 
-            if (offensivePointsScoredOn !== null) {
-              performanceRecord.offensivePointsScoredOn = Math.round(offensivePointsScoredOn);
+          if (offensivePointsScored !== null) {
+            performanceRecord.offensivePointsScored = Math.round(offensivePointsScored);
+          }
+
+          if (offensivePointsScoredOn !== null) {
+            performanceRecord.offensivePointsScoredOn = Math.round(offensivePointsScoredOn);
+          }
+
+          var dse = parseFloat(data.DSE) / 100;
+          var defensivePointsScored = data.DPointsPlayed * dse;
+          var defensivePointsScoredOn = data.DPointsPlayed - defensivePointsScored;
+          var j = 1;
+
+          while (defensivePointsScored % 1 > 0.05 && defensivePointsScored % 1 < 0.95) {
+            if (j > 4) {
+              sails.log.warn('Defensive points won/lost cannot be calculated for player ' + data.Player);
+              defensivePointsScored = null;
+              defensivePointsScoredOn = null;
+              break;
             }
+            defensivePointsScored = (data.DPointsPlayed - j) * dse;
+            defensivePointsScoredOn = (data.DPointsPlayed - j) - defensivePointsScored;
+            j++;
+          }
 
-            var dse = parseFloat(data.DSE) / 100;
-            var defensivePointsScored = data.DPointsPlayed * dse;
-            var defensivePointsScoredOn = data.DPointsPlayed - defensivePointsScored;
-            var j = 1;
+          if (defensivePointsScored !== null) {
+            performanceRecord.defensivePointsScored = Math.round(defensivePointsScored);
+          }
+          if (defensivePointsScoredOn !== null) {
+            performanceRecord.defensivePointsScoredOn = Math.round(defensivePointsScoredOn);
+          }
 
-            while (defensivePointsScored % 1 > 0.05 && defensivePointsScored % 1 < 0.95) {
-              if (j > 4) {
-                sails.log.warn('Defensive points won/lost cannot be calculated for player ' + data.Player);
-                defensivePointsScored = null;
-                defensivePointsScoredOn = null;
-                break;
-              }
-              defensivePointsScored = (data.DPointsPlayed - j) * dse;
-              defensivePointsScoredOn = (data.DPointsPlayed - j) - defensivePointsScored;
-              j++;
-            }
-
-            if (defensivePointsScored !== null) {
-              performanceRecord.defensivePointsScored = Math.round(defensivePointsScored);
-            }
-            if (defensivePointsScoredOn !== null) {
-              performanceRecord.defensivePointsScoredOn = Math.round(defensivePointsScoredOn);
-            }
-
-            performanceRecord.save(function(err, record) {
-              Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {
-                Statistics.createOrRefresh({week: null, season: null, player: playerRecord.id, team: null}, function() {
-                  callback(err, record);
-                });
+          performanceRecord.save(function(err, record) {
+            Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {
+              Statistics.createOrRefresh({week: null, season: null, player: playerRecord.id, team: null}, function() {
+                callback(err, record);
               });
             });
-        });
-    });
+          });
+      });
+    }
   },
   _createModelsFromGame: function(gameObj, season, week, callback) {
     var homeTeam;
@@ -132,9 +150,21 @@ self = module.exports = {
         name: gameObj[0][0].HomeTeam,
         city: gameObj[0][0].HomeTeamCity,
         color: gameObj[0][0].HomeTeamColor
-      }, findOrCreateAwayTeam);
+      }, function(err, homeTeamRecord) {
+        if (err) {
+          Teams.findOne({mluApiId: gameObj[1][0].HomeTeamID}, function(err, homeTeamRecord) {
+            if (err) {
+              throw err;
+            } else {
+              findOrCreateAwayTeam(homeTeamRecord);
+            }
+          });
+        } else {
+          findOrCreateAwayTeam(homeTeamRecord);
+        }
+      });
 
-    function findOrCreateAwayTeam(err, homeTeamRecord) {
+    function findOrCreateAwayTeam(homeTeamRecord) {
       homeTeam = homeTeamRecord;
       Teams.findOrCreate(
         {mluApiId: gameObj[2][0].AwayTeamID},
@@ -143,10 +173,22 @@ self = module.exports = {
           name: gameObj[0][0].AwayTeam,
           city: gameObj[0][0].AwayTeamCity,
           color: gameObj[0][0].AwayTeamColor
-        }, findOrCreateGame);
+        }, function(err, awayTeamRecord) {
+          if (err) {
+            Teams.findOne({mluApiId: gameObj[2][0].AwayTeamID}, function(err, awayTeamRecord) {
+              if (err) {
+                throw err;
+              } else {
+                findOrCreateGame(awayTeamRecord);
+              }
+            });
+          } else {
+            findOrCreateGame(awayTeamRecord);
+          }
+        });
     }
 
-    function findOrCreateGame(err, awayTeamRecord) {
+    function findOrCreateGame(awayTeamRecord) {
       awayTeam = awayTeamRecord;
       Games.findOrCreate(
         {
@@ -154,10 +196,22 @@ self = module.exports = {
           homeTeam: homeTeam.id,
           awayTeam: awayTeam.id,
           week: week.id
-        }, makePerformances);
+        }, function(err, gameRecord) {
+          if (err) {
+            Games.findOne({mluApiId: gameObj[0][0].ga_id_pk}, function(err, gameRecord) {
+              if (err) {
+                throw err;
+              } else {
+                makePerformances(gameRecord);
+              }
+            });
+          } else {
+            makePerformances(gameRecord);
+          }
+        });
     }
 
-    function makePerformances(err, gameRecord) {
+    function makePerformances(gameRecord) {
       var homePerformances = gameObj[5];
       var awayPerformances = gameObj[6];
 
@@ -212,6 +266,10 @@ self = module.exports = {
   },
   scrapeWeek: function(seasonAndWeek, callback) {
     var request = require('request');
+
+    var numberParallel;
+    var numberDone = 0;
+
     request('https://mlustats.herokuapp.com/api/schedule', function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var schedule = JSON.parse(body)[0];
@@ -230,35 +288,61 @@ self = module.exports = {
           return gameObj.Status === 'Final';
         });
 
-        var numberParallel = games.length;
-        var numberDone = 0;
-
+        numberParallel = games.length;
 
         games.forEach(function(element, index, array) {
           Seasons.findOrCreate({mluApiId: element.SeasonID}, function(err, seasonRecord) {
-            Weeks.findOrCreate({season: seasonRecord.id, weekNum: element.Week}, function(err, weekRecord) {
-              request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
-                if (!error && response.statusCode == 200) {
-                  var gameData = JSON.parse(body).data;
-                  self._createModelsFromGame(gameData, seasonRecord, weekRecord, function(err) {
-                    if (err) {
-                      callback(err);
-                    }
-
-                    numberDone++;
-                    console.log(numberDone + ' of ' + numberParallel + ' games complete');
-
-                    if (numberDone === numberParallel) {
-                      Statistics.updatePercentiles(callback);
-                    }
-                  });
+            if (err) {
+              Seasons.findOne({mluApiId: element.SeasonID}, function(err, seasonRecord) {
+                if (err) {
+                  throw err;
+                } else {
+                  findOrCreateWeek(seasonRecord, element);
                 }
               });
-            });
+            } else {
+              findOrCreateWeek(seasonRecord, element);
+            }
           });
         });
       }
     });
+
+    function findOrCreateWeek(seasonRecord, element) {
+      Weeks.findOrCreate({season: seasonRecord.id, weekNum: element.Week}, function(err, weekRecord) {
+        if (err) {
+          Weeks.findOne({season: seasonRecord.id, weekNum: element.Week}, function(err, weekRecord) {
+            if (err) {
+              throw err;
+            } else {
+              makeRequest(weekRecord, seasonRecord, element);
+            }
+          });
+        } else {
+          makeRequest(weekRecord, seasonRecord, element);
+        }
+      });
+    }
+
+    function makeRequest(weekRecord, seasonRecord, element) {
+      request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
+        if (!error && response.statusCode == 200) {
+          var gameData = JSON.parse(body).data;
+          self._createModelsFromGame(gameData, seasonRecord, weekRecord, function(err) {
+            if (err) {
+              callback(err);
+            }
+
+            numberDone++;
+            console.log(numberDone + ' of ' + numberParallel + ' games complete');
+
+            if (numberDone === numberParallel) {
+              Statistics.updatePercentiles(callback);
+            }
+          });
+        }
+      });
+    }
   },
   scrapeCurrentWeek: function(callback) {
     var request = require('request');

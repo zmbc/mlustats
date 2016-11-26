@@ -14,7 +14,8 @@ module.exports = {
     },
     mluApiId: {
       type: 'string',
-      required: true
+      required: true,
+      unique: true
     }
   }
 };
