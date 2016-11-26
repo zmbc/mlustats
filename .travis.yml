@@ -9,4 +9,5 @@ services:
   - mysql
 before_script:
   - mysql -e "create database IF NOT EXISTS mlustats;" -uroot
+  - gem install sass
 script: "grunt ci"
