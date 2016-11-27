@@ -13,5 +13,13 @@ module.exports.bootstrap = function(cb) {
 
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  cb();
+  Statistics.query('ALTER TABLE `statistics` ADD UNIQUE `unique_index`(`team`, `player`, `season`, `week`);', function(err, result) {
+    console.log(err);
+    console.log(result);
+    if (err) {
+      cb(err);
+    } else {
+      cb();
+    }
+  });
 };

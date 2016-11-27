@@ -9,16 +9,20 @@ module.exports = {
 
   attributes: {
     player: {
-      model: 'players'
+      model: 'players',
+      required: true
     },
     team: {
-      model: 'teams'
+      model: 'teams',
+      required: true
     },
     season: {
-      model: 'seasons'
+      type: 'integer',
+      required: true
     },
     week: {
-      model: 'weeks'
+      type: 'integer',
+      required: true
     },
     goals: {
       type: 'integer'
@@ -195,19 +199,29 @@ module.exports = {
     }
   },
   createOrRefresh: function(opts, cb) {
-    Statistics.findOne(opts).exec(function(err, self) {
-      if (self) {
-        Statistics.refreshStatistics(self, function(err) {
-          if (err) cb(err);
-          self.save(function(err) {
-            if (err) cb(err);
-            cb(null, self);
-          });
+    Statistics.findOrCreate(opts).exec(function(err, self) {
+      if (err) {
+        Statistics.findOne(opts).exec(function(err, self) {
+          if (err) {
+            cb(err);
+          } else {
+            refresh(self);
+          }
         });
       } else {
-        Statistics.create(opts).exec(cb);
+        refresh(self);
       }
     });
+
+    function refresh(self) {
+      Statistics.refreshStatistics(self, function(err) {
+        if (err) cb(err);
+        self.save(function(err) {
+          if (err) cb(err);
+          cb(null, self);
+        });
+      });
+    }
   },
   refreshDerivativeStatistics: function(self) {
     if (self.offensivePointsScored !== null && typeof self.offensivePointsScored !== 'undefined' &&
@@ -272,26 +286,26 @@ module.exports = {
   },
   scopedPerformances: function(self, cb) {
     var query = 'SELECT * FROM performances ' +
-                'LEFT JOIN games ON performances.game = games.id ' +
-                'LEFT JOIN weeks ON games.week = weeks.id ';
+                'LEFT JOIN games ON performances.game = games.id';
 
-    if(self.player !== null && self.team === null) {
+    if(self.player !== -1 && self.team === -1) {
       // This is a Statistic for a player
       query += ' WHERE performances.player = ' + self.player;
-    } else if(self.team !== null && self.player === null) {
+    } else if(self.team !== -1 && self.player === -1) {
       // This is a Statistic for a team
       query += ' WHERE performances.team = ' + self.team;
     }
 
-    if(self.season !== null && self.week === null) {
-      // This is a Statistic for a season
-      query += ' AND weeks.season = ' + self.season;
-    } else if(self.week !== null && self.season === null) {
-      // This is a Statistic for a week
-      if (self.player !== null && self.team === null) {
+    if(self.season !== -1) {
+      query += ' AND games.season = ' + self.season;
+    }
+
+    if(self.week !== -1) {
+      // This is a Statistic for a week, which shouldn't happen for a player
+      if (self.player !== -1 && self.team === -1) {
         cb(new Error('Tried to make a Statistic that should be a Performance'));
       }
-      query += ' AND weeks.id = ' + self.week;
+      query += ' AND games.week = ' + self.week;
     }
 
     Performances.query(query, cb);
@@ -338,7 +352,7 @@ module.exports = {
         'defensivePointsScoredOn'
       ];
 
-      if (self.player !== null && self.team === null) {
+      if (self.player !== -1 && self.team === -1) {
         sevenBasedAttrs.forEach(function(attr, index, array) {
           self[attr] = 0;
 
@@ -346,7 +360,7 @@ module.exports = {
             self[attr] += performance[attr];
           });
         });
-      } else if (self.team !== null && self.player === null) {
+      } else if (self.team !== -1 && self.player === -1) {
         sevenBasedAttrs.forEach(function(attr, index, array) {
           self[attr] = 0;
 
@@ -365,31 +379,54 @@ module.exports = {
     });
   },
   updatePercentiles: function(cb) {
+    sails.log.debug('Updating percentiles');
     Statistics.find().exec(function(err, stats) {
-      Seasons.find().populate('weeks').exec(function(err, seasons) {
-        seasons.forEach(function(season, index, array) {
-          percentileStats(stats.filter(function(elem) { return elem.season === season.id; }));
+      var seasonValues = stats.map(function(elem) {
+        return elem.season;
+      }).filter(function(elem) {
+        return elem !== -1;
+      }).filter(function(elem, index, array) {
+        return array.indexOf(elem) === index;
+      });
+      var weekValues = stats.map(function(elem) {
+        return elem.week;
+      }).filter(function(elem) {
+        return elem !== -1;
+      }).filter(function(elem, index, array) {
+        return array.indexOf(elem) === index;
+      });
 
-          season.weeks.forEach(function(week, weekIndex, weekArray) {
-            percentileStats(stats.filter(function(elem) { return elem.week === week.id; }));
-          });
+      sails.log.verbose('All seasons:');
+      sails.log.verbose(seasonValues);
+      sails.log.verbose('All weeks:');
+      sails.log.verbose(weekValues);
+
+      seasonValues.forEach(function(season, index, array) {
+        sails.log.verbose('Updating percentiles for season ' + season);
+        percentileStats(stats.filter(function(elem) { return elem.season === season; }));
+
+        weekValues.forEach(function(week, weekIndex, weekArray) {
+          sails.log.verbose('Updating percentiles for week ' + week + ' of season ' + season);
+          percentileStats(stats.filter(function(elem) { return elem.week === week && elem.season === season; }));
         });
+      });
 
-        percentileStats(stats.filter(function(elem) { return elem.season === null && elem.week === null; }));
+      var numberDone = 0;
 
-        var numberDone = 0;
-
-        stats.forEach(function(stat, statIndex, statArray) {
-          stat.save(function(err) {
-            if (err) {
-              cb(err);
-            } else {
-              numberDone++;
-              if (numberDone === statArray.length) {
-                cb();
-              }
+      sails.log.debug('Saving statistics');
+      stats.forEach(function(stat, statIndex, statArray) {
+        sails.log.verbose('Saving statistic ' + (statIndex + 1) + ' of ' + statArray.length);
+        stat.save(function(err) {
+          if (err) {
+            cb(err);
+          } else {
+            sails.log.verbose('Statistic ' + (statIndex + 1) + ' of ' + statArray.length + ' saved');
+            numberDone++;
+            if (numberDone === statArray.length) {
+              sails.log.debug('Done saving all statistics');
+              cb();
             }
-          });
+          }
         });
       });
     });

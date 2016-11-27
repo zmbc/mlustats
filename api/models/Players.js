@@ -26,7 +26,7 @@ module.exports = {
     },
 
     mluApiId: {
-      type: 'string',
+      type: 'integer',
       unique: true,
       required: true
     }

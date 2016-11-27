@@ -17,13 +17,18 @@ module.exports = {
       required: true
     },
     
+    season: {
+      type: 'integer',
+      required: true
+    },
+
     week: {
-      model: 'weeks',
+      type: 'integer',
       required: true
     },
     
     mluApiId: {
-      type: 'string',
+      type: 'integer',
       unique: true
     }
   }

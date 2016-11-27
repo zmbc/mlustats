@@ -18,7 +18,7 @@ self = module.exports = {
       
       return result;
   },
-  _makePerformanceFromData: function(data, teamRecord, gameRecord, season, callback) {
+  _makePerformanceFromData: function(data, teamRecord, gameRecord, seasonId, callback) {
     Players.findOrCreate(
       {mluApiId: data.PlayerID},
       {
@@ -129,8 +129,8 @@ self = module.exports = {
           }
 
           performanceRecord.save(function(err, record) {
-            Statistics.createOrRefresh({week: null, season: season.id, player: playerRecord.id, team: null}, function() {
-              Statistics.createOrRefresh({week: null, season: null, player: playerRecord.id, team: null}, function() {
+            Statistics.createOrRefresh({week: -1, season: seasonId, player: playerRecord.id, team: -1}, function() {
+              Statistics.createOrRefresh({week: -1, season: -1, player: playerRecord.id, team: -1}, function() {
                 callback(err, record);
               });
             });
@@ -138,11 +138,12 @@ self = module.exports = {
       });
     }
   },
-  _createModelsFromGame: function(gameObj, season, week, callback) {
+  _createModelsFromGame: function(gameObj, seasonId, weekId, callback) {
     var homeTeam;
     var awayTeam;
     var game;
 
+    sails.log.verbose('Finding or creating teams');
     Teams.findOrCreate(
       {mluApiId: gameObj[1][0].HomeTeamID},
       {
@@ -190,12 +191,14 @@ self = module.exports = {
 
     function findOrCreateGame(awayTeamRecord) {
       awayTeam = awayTeamRecord;
+      sails.log.verbose('Finding or creating game');
       Games.findOrCreate(
         {
           mluApiId: gameObj[0][0].ga_id_pk,
           homeTeam: homeTeam.id,
           awayTeam: awayTeam.id,
-          week: week.id
+          season: seasonId,
+          week: weekId
         }, function(err, gameRecord) {
           if (err) {
             Games.findOne({mluApiId: gameObj[0][0].ga_id_pk}, function(err, gameRecord) {
@@ -212,6 +215,7 @@ self = module.exports = {
     }
 
     function makePerformances(gameRecord) {
+      sails.log.verbose('Making performances');
       var homePerformances = gameObj[5];
       var awayPerformances = gameObj[6];
 
@@ -219,13 +223,14 @@ self = module.exports = {
       var numberDone = 0;
 
       homePerformances.forEach(function(element, index, array) {
-        self._makePerformanceFromData(element, homeTeam, gameRecord, season, function(err, record) {
+        sails.log.verbose('Making home performance ' + (index + 1) + ' of ' + array.length);
+        self._makePerformanceFromData(element, homeTeam, gameRecord, seasonId, function(err, record) {
           if (err) {
             callback(err);
           }
 
           numberDone++;
-          console.log(numberDone + ' of ' + numberParallel + ' performances complete');
+          sails.log.verbose(numberDone + ' of ' + numberParallel + ' performances complete');
 
           if (numberDone === numberParallel) {
             makeStatistics();
@@ -234,29 +239,32 @@ self = module.exports = {
       });
 
       awayPerformances.forEach(function(element, index, array) {
+        sails.log.verbose('Making away performance ' + (index + 1) + ' of ' + array.length);
         game = gameRecord;
-        self._makePerformanceFromData(element, awayTeam, gameRecord, season, function(err, record) {
+        self._makePerformanceFromData(element, awayTeam, gameRecord, seasonId, function(err, record) {
           if (err) {
             callback(err);
           }
 
           numberDone++;
-          console.log(numberDone + ' of ' + numberParallel + ' performances complete');
+          sails.log.verbose(numberDone + ' of ' + numberParallel + ' performances complete');
 
           if (numberDone === numberParallel) {
-            makeStatistics(gameRecord);
+            makeStatistics();
           }
         });
       });
     }
     
     function makeStatistics() {
-      Statistics.createOrRefresh({week: game.week, season: null, team: homeTeam.id, player: null}, function() {
-        Statistics.createOrRefresh({week: game.week, season: null, team: awayTeam.id, player: null}, function() {
-          Statistics.createOrRefresh({week: game.week, season: null, team: null, player: null}, function() {
-            Statistics.createOrRefresh({week: null, season: season.id, team: homeTeam.id, player: null}, function() {
-              Statistics.createOrRefresh({week: null, season: season.id, team: awayTeam.id, player: null}, function() {
-                Statistics.createOrRefresh({week: null, season: season.id, team: null, player: null}, callback);
+      sails.log.verbose('Updating weekly statistics for ' + awayTeam.name + ' and ' + homeTeam.name + ' and the league');
+      Statistics.createOrRefresh({week: weekId, season: seasonId, team: homeTeam.id, player: -1}, function() {
+        Statistics.createOrRefresh({week: weekId, season: seasonId, team: awayTeam.id, player: -1}, function() {
+          Statistics.createOrRefresh({week: weekId, season: seasonId, team: -1, player: -1}, function() {
+            sails.log.verbose('Updating season statistics for ' + awayTeam.name + ' and ' + homeTeam.name + ' and the league');
+            Statistics.createOrRefresh({week: -1, season: seasonId, team: homeTeam.id, player: -1}, function() {
+              Statistics.createOrRefresh({week: -1, season: seasonId, team: awayTeam.id, player: -1}, function() {
+                Statistics.createOrRefresh({week: -1, season: seasonId, team: -1, player: -1}, callback);
               });
             });
           });
@@ -264,21 +272,27 @@ self = module.exports = {
       });
     }
   },
-  scrapeWeek: function(seasonAndWeek, callback) {
+  scrapeWeek: function(week, season, callback) {
     var request = require('request');
 
     var numberParallel;
     var numberDone = 0;
 
-    request('https://mlustats.herokuapp.com/api/schedule', function (error, response, body) {
+    var url = 'https://mlustats.herokuapp.com/api/schedule';
+
+    if (season) {
+      url += '?sid=' + season;
+    }
+
+    request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var schedule = JSON.parse(body)[0];
         var games;
         
-        if (seasonAndWeek !== 'all') {
+        if (week !== 'all') {
           games = schedule.filter(function(gameObj) {
-            return gameObj.SeasonID === seasonAndWeek.season &&
-                gameObj.Week === seasonAndWeek.week;
+            return gameObj.SeasonID === season &&
+                gameObj.Week === week;
           });
         } else {
           games = schedule;
@@ -288,53 +302,30 @@ self = module.exports = {
           return gameObj.Status === 'Final';
         });
 
+        sails.log.debug('Beginning to scrape ' + games.length + ' games');
+
         numberParallel = games.length;
 
-        games.forEach(function(element, index, array) {
-          Seasons.findOrCreate({mluApiId: element.SeasonID}, function(err, seasonRecord) {
-            if (err) {
-              Seasons.findOne({mluApiId: element.SeasonID}, function(err, seasonRecord) {
-                if (err) {
-                  throw err;
-                } else {
-                  findOrCreateWeek(seasonRecord, element);
-                }
-              });
-            } else {
-              findOrCreateWeek(seasonRecord, element);
-            }
-          });
+        games.forEach(function(game, index, array) {
+          makeRequest(game, index);
         });
       }
     });
 
-    function findOrCreateWeek(seasonRecord, element) {
-      Weeks.findOrCreate({season: seasonRecord.id, weekNum: element.Week}, function(err, weekRecord) {
-        if (err) {
-          Weeks.findOne({season: seasonRecord.id, weekNum: element.Week}, function(err, weekRecord) {
-            if (err) {
-              throw err;
-            } else {
-              makeRequest(weekRecord, seasonRecord, element);
-            }
-          });
-        } else {
-          makeRequest(weekRecord, seasonRecord, element);
-        }
-      });
-    }
-
-    function makeRequest(weekRecord, seasonRecord, element) {
-      request('https://mlustats.herokuapp.com/api/score?gid=' + element.GameID, function(error, response, body) {
+    function makeRequest(game, index) {
+      var weekId = game.Week;
+      var seasonId = game.SeasonID;
+      request('https://mlustats.herokuapp.com/api/score?gid=' + game.GameID, function(error, response, body) {
         if (!error && response.statusCode == 200) {
           var gameData = JSON.parse(body).data;
-          self._createModelsFromGame(gameData, seasonRecord, weekRecord, function(err) {
+          sails.log.verbose('Recieved data about game ' + (index + 1));
+          self._createModelsFromGame(gameData, seasonId, weekId, function(err) {
             if (err) {
               callback(err);
             }
 
             numberDone++;
-            console.log(numberDone + ' of ' + numberParallel + ' games complete');
+            sails.log.debug(numberDone + ' of ' + numberParallel + ' games complete');
 
             if (numberDone === numberParallel) {
               Statistics.updatePercentiles(callback);
@@ -351,11 +342,11 @@ self = module.exports = {
         var schedule = JSON.parse(body)[0];
         var currentWeek = self._maxSeasonAndWeek(schedule);
         
-        self.scrapeWeek(currentWeek, callback);
+        self.scrapeWeek(currentWeek.week, currentWeek.season, callback);
       }
     });
   },
-  scrapeAll: function(callback) {
-    self.scrapeWeek('all', callback);
+  scrapeSeason: function(season, callback) {
+    self.scrapeWeek('all', season, callback);
   }
 };
