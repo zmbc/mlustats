@@ -302,8 +302,8 @@ describe('ScraperService', function() {
         ]
       ],
       // Season and week
-      {id: 1},
-      {id: 1},
+      1,
+      1,
       function() {
         Teams
           .find({name: {'!': 'Fake Team'}})
@@ -313,20 +313,20 @@ describe('ScraperService', function() {
           .exec(function(err, teams) {
             teams.length.should.equal(2);
 
-            teams[0].mluApiId.should.equal('4');
+            teams[0].mluApiId.should.equal(4);
             teams[0].name.should.equal('Away Team Name');
             teams[0].city.should.equal('Away Team City');
             teams[0].color.should.equal('green');
 
-            teams[1].mluApiId.should.equal('8');
+            teams[1].mluApiId.should.equal(8);
             teams[1].name.should.equal('Home Team Name');
             teams[1].city.should.equal('Home Team City');
             teams[1].color.should.equal('blue');
 
             teams[0].players.length.should.equal(2);
             teams[0].players.forEach(function(player, index, array) {
-              ['67', '64'].should.containEql(player.mluApiId);
-              if (player.mluApiId === '64') {
+              [67, 64].should.containEql(player.mluApiId);
+              if (player.mluApiId === 64) {
                 player.name.should.equal('Away Team Player 1');
               } else {
                 player.name.should.equal('Away Team Player 2');
@@ -335,8 +335,8 @@ describe('ScraperService', function() {
 
             teams[1].players.length.should.equal(2);
             teams[1].players.forEach(function(player, index, array) {
-              ['45', '48'].should.containEql(player.mluApiId);
-              if (player.mluApiId === '45') {
+              [45, 48].should.containEql(player.mluApiId);
+              if (player.mluApiId === 45) {
                 player.name.should.equal('Home Team Player 1');
               } else {
                 player.name.should.equal('Home Team Player 2');
@@ -453,7 +453,7 @@ describe('ScraperService', function() {
               });
             });
 
-            Games.find(teams[0].performances[0].game).populate('week').exec(function(err, game) {
+            Games.find(teams[0].performances[0].game).exec(function(err, game) {
               game = game[0];
               Statistics.find().exec(function(err, statsRecords) {
                 // 1 for each player's career
@@ -466,7 +466,7 @@ describe('ScraperService', function() {
 
                 var player1Stats = statsRecords
                   .filter(function(value) {
-                    return value.season ===  game.week.season && value.player === teams[0].players[0].id;
+                    return value.season === game.season && value.player === teams[0].players[0].id;
                   })[0];
 
                 player1Stats.goals.should.equal(7);
@@ -516,7 +516,7 @@ describe('ScraperService', function() {
 
                 var awayTeamWeekStats = statsRecords
                   .filter(function(value) {
-                    return value.week !== null && value.team !== null && value.week === game.week.id && value.team === teams[0].id;
+                    return value.week !== -1 && value.team !== -1 && value.week === game.week && value.season === game.season && value.team === teams[0].id;
                   })[0];
 
                 awayTeamWeekStats.goals.should.equal(18);
