@@ -13,13 +13,20 @@ module.exports.bootstrap = function(cb) {
 
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  Statistics.query('ALTER TABLE `statistics` ADD UNIQUE `unique_index`(`team`, `player`, `season`, `week`);', function(err, result) {
-    console.log(err);
-    console.log(result);
+  Statistics.query("SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS " +
+                    "WHERE table_schema=DATABASE() AND table_name='statistics' AND index_name='unique_index';", function(err, result) {
     if (err) {
       cb(err);
-    } else {
+    } else if (result.IndexIsThere !== 0) {
       cb();
+    } else {
+      Statistics.query('ALTER TABLE `statistics` ADD UNIQUE `unique_index`(`team`, `player`, `season`, `week`);', function(err, result) {
+        if (err) {
+          cb(err);
+        } else {
+          cb();
+        }
+      });
     }
   });
 };
