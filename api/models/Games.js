@@ -30,6 +30,11 @@ module.exports = {
     mluApiId: {
       type: 'integer',
       unique: true
+    },
+
+    date: {
+      type: 'datetime',
+      required: true
     }
   }
 };

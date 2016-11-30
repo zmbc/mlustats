@@ -1,4 +1,6 @@
 var request = require('request');
+var moment = require('moment');
+var zpad = require('zpad');
 
 self = module.exports = {
   _maxSeasonAndWeek: function(schedule) {
@@ -192,13 +194,17 @@ self = module.exports = {
     function findOrCreateGame(awayTeamRecord) {
       awayTeam = awayTeamRecord;
       sails.log.verbose('Finding or creating game');
+      var dateSplit = gameObj[0][0].ga_start_time.split(" ");
+      var offset = gameObj[0][0].ga_time_zone;
+      var dateString = `${dateSplit[2]} ${dateSplit[3]} ${dateSplit[4]} ${dateSplit[5]} -${zpad(-offset)}00`;
       Games.findOrCreate(
         {
           mluApiId: gameObj[0][0].ga_id_pk,
           homeTeam: homeTeam.id,
           awayTeam: awayTeam.id,
           season: seasonId,
-          week: weekId
+          week: weekId,
+          date: moment(dateString, 'MMM D, YYYY h:mmA Z').toString()
         }, function(err, gameRecord) {
           if (err) {
             Games.findOne({mluApiId: gameObj[0][0].ga_id_pk}, function(err, gameRecord) {
@@ -288,7 +294,7 @@ self = module.exports = {
       if (!error && response.statusCode == 200) {
         var schedule = JSON.parse(body)[0];
         var games;
-        
+
         if (week !== 'all') {
           games = schedule.filter(function(gameObj) {
             return gameObj.SeasonID === season &&
@@ -297,7 +303,7 @@ self = module.exports = {
         } else {
           games = schedule;
         }
-        
+
         games = games.filter(function(gameObj) {
           return gameObj.Status === 'Final';
         });
